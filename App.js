@@ -1,50 +1,47 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import HomeScreen from './screens/HomeScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import SettingsScreen from './screens/SettingsScreen';
+import SignInScreen from './screens/SignInScreen';
+import SignUpScreen from './screens/SignUpScreen';
 
+const Tab = createBottomTabNavigator();
 
-const firebaseConfig = {
+const App = () => {
+  const [isSignedIn, setIsSignedIn] = useState(true);
 
-  apiKey: "AIzaSyCzh4ssvSoNGdBUt1InneX44WWA41gw0ys",
-
-  authDomain: "mug23-19001.firebaseapp.com",
-
-  projectId: "mug23-19001",
-
-  storageBucket: "mug23-19001.appspot.com",
-
-  messagingSenderId: "75090662092",
-
-  appId: "1:75090662092:web:844c5787131c08e185e869",
-
-  measurementId: "G-361VPK6C5L"
-
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarLabelStyle: {
+            fontSize: 16,
+            fontWeight: 'bold',
+          },
+        }}
+      >
+        {isSignedIn ? (
+          <>
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="Settings" component={SettingsScreen} />
+          </>
+        ) : (
+          <>
+            <Tab.Screen name="SignIn">
+              {(props) => <SignInScreen {...props} setIsSignedIn={setIsSignedIn} />}
+            </Tab.Screen>
+            <Tab.Screen name="SignUp">
+              {(props) => <SignUpScreen {...props} setIsSignedIn={setIsSignedIn} />}
+            </Tab.Screen>
+          </>
+        )}
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
+export default App;
 
-
-
-
-
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
