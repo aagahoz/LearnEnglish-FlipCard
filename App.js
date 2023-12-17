@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './screens/HomeScreen';
+import Home from './screens/Home';
 import ProfileScreen from './screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import SignInScreen from './screens/SignInScreen';
@@ -10,7 +10,7 @@ import SignUpScreen from './screens/SignUpScreen';
 const Tab = createBottomTabNavigator();
 
 const App = () => {
-  const [isSignedIn, setIsSignedIn] = useState(true);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   return (
     <NavigationContainer>
@@ -24,7 +24,7 @@ const App = () => {
       >
         {isSignedIn ? (
           <>
-            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Home" component={Home} />
             <Tab.Screen name="Profile" component={ProfileScreen} />
             <Tab.Screen name="Settings" component={SettingsScreen} />
           </>
@@ -32,9 +32,13 @@ const App = () => {
           <>
             <Tab.Screen name="SignIn">
               {(props) => <SignInScreen {...props} setIsSignedIn={setIsSignedIn} />}
+              
             </Tab.Screen>
+
             <Tab.Screen name="SignUp">
-              {(props) => <SignUpScreen {...props} setIsSignedIn={setIsSignedIn} />}
+              {(props) => (
+                <SignUpScreen {...props} setIsSignedIn={() => setIsSignedIn(true)} />
+              )}
             </Tab.Screen>
           </>
         )}
@@ -44,4 +48,3 @@ const App = () => {
 };
 
 export default App;
-

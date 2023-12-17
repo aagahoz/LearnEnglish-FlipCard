@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Input, Button, Text } from 'react-native-elements';
 import auth from '@react-native-firebase/auth';
 
-const SignInScreen = ({ navigation }) => {
+const SignInScreen = ({ navigation, setIsSignedIn }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -12,14 +12,13 @@ const SignInScreen = ({ navigation }) => {
     try {
       setLoading(true);
       // const userCredential = await auth().signInWithEmailAndPassword(email, password);
-      // Giriş başarılı
       // console.log('Kullanıcı giriş yaptı:', userCredential.user);
-      console.log("basarili");
 
+      // Kullanıcı giriş yaptıktan sonra navigasyonu güncelle
+      setIsSignedIn(true);
+      console.log("basarili")
     } catch (error) {
-      // Giriş başarısız
       console.error(error);
-      console.error("testtttt");
       setLoading(false);
     }
   };
