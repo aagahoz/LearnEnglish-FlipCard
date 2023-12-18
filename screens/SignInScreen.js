@@ -8,6 +8,9 @@ import {
   StyleSheet,
 } from 'react-native';
 
+// import react
+import React from 'react';
+
 import { auth } from "../firebaseConfig";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
