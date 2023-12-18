@@ -1,79 +1,128 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Input, Button, Text } from 'react-native-elements';
-import auth from '@react-native-firebase/auth';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 
-const SignInScreen = ({ navigation, setIsSignedIn }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+import { auth } from "../firebaseConfig";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
-  const handleSignIn = async () => {
-    try {
-      setLoading(true);
-      // const userCredential = await auth().signInWithEmailAndPassword(email, password);
-      // console.log('Kullanıcı giriş yaptı:', userCredential.user);
+export default function Login({ navigation, setIsSignedIn }) {
 
-      // Kullanıcı giriş yaptıktan sonra navigasyonu güncelle
-      setIsSignedIn(true);
-      console.log("basarili")
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
+  if (auth.currentUser)
+  {
+    setIsSignedIn(true);
+  } else
+  {
+    onAuthStateChanged(auth, (user) => {
+      if (user)
+      {
+        setIsSignedIn(true);
+      }
+    });
+  }
+
+  let [errorMessage, setErrorMessage] = React.useState("");
+  let [email, setEmail] = React.useState("");
+  let [password, setPassword] = React.useState("");
+
+  let login = () => {
+    if (email !== "" && password !== "")
+    {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log(userCredential.user);
+          // navigation.navigate("Home", { user: userCredential.user });
+          setIsSignedIn(true);
+          setErrorMessage("");
+          setEmail("");
+          setPassword("");
+        })
+        .catch((error) => {
+          setErrorMessage(error.message)
+        });
+    } else
+    {
+      setErrorMessage("Please enter an email and password");
     }
-  };
+  }
 
   return (
-    <View style={styles.container}>
-      <Text h3 style={styles.title}>
-        Giriş Yap
-      </Text>
-      <Input
-        placeholder="E-posta"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={60}
+      style={styles.container}>
+      <Text style={styles.title}>Login</Text>
+      <Text style={styles.errorMessage}>{errorMessage}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#BEBEBE"
         value={email}
-        onChangeText={(text) => setEmail(text)}
-        autoCapitalize="none"
+        onChangeText={setEmail}
       />
-      <Input
-        placeholder="Şifre"
-        value={password}
-        onChangeText={(text) => setPassword(text)}
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#BEBEBE"
         secureTextEntry
-        autoCapitalize="none"
+        value={password}
+        onChangeText={setPassword}
       />
-      <Button
-        title="Giriş Yap"
-        onPress={handleSignIn}
-        loading={loading}
-        disabled={loading}
-        containerStyle={styles.buttonContainer}
-      />
-      <Button
-        title="Üye Ol"
-        type="clear"
-        onPress={() => navigation.navigate('SignUp')}
-        titleStyle={styles.signupButton}
-      />
-    </View>
+      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+        <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')}>
+        <Text style={styles.linkText}>Forgotten your password? Reset</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.loginButton} onPress={login}>
+        <Text style={styles.loginButtonText}>Login</Text>
+      </TouchableOpacity>
+    </KeyboardAvoidingView>
   );
-};
+}
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 16,
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
   title: {
-    marginBottom: 16,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  errorMessage: {
+    color: 'red',
+    marginBottom: 20,
+  },
+  input: {
+    width: '80%',
+    height: 40,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 20,
+    borderRadius: 5,
+  },
+  linkText: {
+    color: '#007BFF',
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+  },
+  loginButtonText: {
+    color: '#fff',
     textAlign: 'center',
   },
-  buttonContainer: {
-    marginTop: 16,
-  },
-  signupButton: {
-    color: 'blue', // Üye Ol buton rengi
-  },
 });
-
-export default SignInScreen;
