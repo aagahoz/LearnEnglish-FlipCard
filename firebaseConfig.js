@@ -21,6 +21,64 @@ export {
   db
 }
 
+
+
+// Firestore'dan veri çekme işlemi
+const checkAdminStatusById = async (userId) => {
+  console.log("ben 1. kod");
+  const firestore = getFirestore(db);
+  console.log("ben 2. kod");
+  userId = "okDQYrS8hcYDIbTFwpD3";
+  try
+  {
+    const userDoc = doc(firestore, 'Users', userId);
+    const userSnapshot = await getDocs(userDoc);
+    console.log("ben 3. kod");
+
+    if (userSnapshot.exists())
+    {
+      const userData = userSnapshot.data();
+      console.log("ben 4. kod");
+
+      // Kullanıcı admin mi kontrol et
+      if (userData && 'isAdmin' in userData)
+      {
+        console.log("ben 5. kod");
+
+        return userData.isAdmin; // true veya false dönecek
+      } else
+      {
+        console.log("ben 6. kod");
+
+        console.error('Error: User document does not have isAdmin field');
+        return null; // Eğer isAdmin alanı belgede yoksa, null veya başka bir değer dönebilirsiniz
+      }
+    } else
+    {
+      console.log("ben 7. kod");
+
+      console.error('Error: User document not found');
+      return null; // Eğer belge bulunamazsa, null veya başka bir değer dönebilirsiniz
+    }
+  } catch (error)
+  {
+    console.log("ben 8. kod");
+
+    console.error('Error fetching data from Firestore:', error);
+    return null;
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
 // CRUD Islemleri
 
 

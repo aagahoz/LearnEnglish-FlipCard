@@ -7,6 +7,7 @@ import SettingsScreen from './screens/SettingsScreen';
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import LearnedScreen from './screens/LearnedSecreen';
+import HomeScreenAdmin from './screens/HomeScreenAdmin';
 
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { addDoc, Timestamp } from 'firebase/firestore';
@@ -20,6 +21,8 @@ const Tab = createBottomTabNavigator();
 
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
 
   return (
     <NavigationContainer>
@@ -32,28 +35,39 @@ const App = () => {
         }}
       >
         {isSignedIn ? (
-          <>
-            <Tab.Screen name="Home">
-              {(props) => <HomeScreen {...props} setIsSignedIn={setIsSignedIn} />}
-            </Tab.Screen>
-            <Tab.Screen name="Profile">
-              {(props) => <ProfileScreen {...props} setIsSignedIn={setIsSignedIn} />}
-            </Tab.Screen>
-            <Tab.Screen name="Learned Words">
-              {(props) => <LearnedScreen {...props} setIsSignedIn={setIsSignedIn} />}
-            </Tab.Screen>
-            <Tab.Screen name="Settings">
-              {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} />}
-            </Tab.Screen>
-            
-          </>
-        ) : (
+          isAdmin ? (
+            <>
+              <Tab.Screen name="Home Screen">
+                {(props) => <HomeScreenAdmin {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
+              </Tab.Screen>
+              <Tab.Screen name="Settings">
+                {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
+              </Tab.Screen>
+            </>
+          ) :
+            (
+              <>
+                <Tab.Screen name="Home">
+                  {(props) => <HomeScreen {...props} setIsSignedIn={setIsSignedIn} />}
+                </Tab.Screen>
+                <Tab.Screen name="Profile">
+                  {(props) => <ProfileScreen {...props} setIsSignedIn={setIsSignedIn} />}
+                </Tab.Screen>
+                <Tab.Screen name="Learned Words">
+                  {(props) => <LearnedScreen {...props} setIsSignedIn={setIsSignedIn} />}
+                </Tab.Screen>
+                <Tab.Screen name="Settings">
+                  {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} />}
+                </Tab.Screen>
+
+              </>
+            )) : (
           <>
             <Tab.Screen name="SignIn">
-              {(props) => <SignInScreen {...props} setIsSignedIn={setIsSignedIn} />}
+              {(props) => <SignInScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin}  />}
             </Tab.Screen>
             <Tab.Screen name="SignUp">
-              {(props) => <SignUpScreen {...props} setIsSignedIn={() => setIsSignedIn(true)} />}
+              {(props) => <SignUpScreen {...props} setIsSignedIn={() => setIsSignedIn(true)} setIsAdmin={() => setIsAdmin(true)}  />}
             </Tab.Screen>
           </>
         )}

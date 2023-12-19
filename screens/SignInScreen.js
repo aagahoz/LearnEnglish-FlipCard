@@ -1,94 +1,73 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { auth } from '../firebaseConfig'; // Firebase projenizin Firebase Authentication bağlantısını içeren bir dosya
 
-// import react
-import React from 'react';
+export default function SignUp({ navigation, setIsSignedIn, setIsAdmin }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-import { auth } from "../firebaseConfig";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+  const login = async () => {
+    if (email !== '' && password !== '') {
+      try {
+        // Firebase Authentication ile oturum açma
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userId = userCredential.user.uid;
 
-export default function Login({ navigation, setIsSignedIn }) {
+        // Firestore'da kullanıcının varlığını kontrol etme
+        const firestore = getFirestore();
+        const userDocRef = doc(firestore, 'Users', userId);
+        const userDocSnapshot = await getDoc(userDocRef);
 
-  if (auth.currentUser)
-  {
-    setIsSignedIn(true);
-  } else
-  {
-    onAuthStateChanged(auth, (user) => {
-      if (user)
-      {
-        setIsSignedIn(true);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          if (userData && 'isAdmin' in userData) {
+            console.log('isAdmin:', userData.isAdmin);
+            setIsSignedIn(true);
+            setIsAdmin(userData.isAdmin === true); // Eğer isAdmin true ise, setIsAdmin değerini true yap
+          } else {
+            console.log('User document does not have isAdmin field');
+            setIsSignedIn(true);
+            setIsAdmin(false);
+          }
+        } else {
+          console.log('User document not found');
+        }
+
+        // İşlemler başarılıysa, başka bir ekrana yönlendirme vb. yapabilirsiniz.
+      } catch (error) {
+        setErrorMessage(error.message);
       }
-    });
-  }
-
-  let [errorMessage, setErrorMessage] = React.useState("");
-  let [email, setEmail] = React.useState("");
-  let [password, setPassword] = React.useState("");
-
-  let login = () => {
-    if (email !== "" && password !== "")
-    {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log(userCredential.user);
-          // navigation.navigate("Home", { user: userCredential.user });
-          setIsSignedIn(true);
-          setErrorMessage("");
-          setEmail("");
-          setPassword("");
-        })
-        .catch((error) => {
-          setErrorMessage(error.message)
-        });
-    } else
-    {
-      setErrorMessage("Please enter an email and password");
+    } else {
+      setErrorMessage('Please enter an email and password');
     }
-  }
+  };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={60}
-      style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <Text style={styles.errorMessage}>{errorMessage}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Login Screen</Text>
       <TextInput
-        style={styles.input}
         placeholder="Email"
-        placeholderTextColor="#BEBEBE"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => setEmail(text)}
+        style={styles.input}
       />
       <TextInput
-        style={styles.input}
         placeholder="Password"
-        placeholderTextColor="#BEBEBE"
-        secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => setPassword(text)}
+        secureTextEntry
+        style={styles.input}
       />
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')}>
-        <Text style={styles.linkText}>Forgotten your password? Reset</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.loginButton} onPress={login}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
-  );
-}
+      <Button title="Login" onPress={login} />
+      <Text style={styles.title}>Login Screen</Text>
 
+      <Text style={styles.errorMessage}>{errorMessage}</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -102,30 +81,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  errorMessage: {
-    color: 'red',
-    marginBottom: 20,
-  },
   input: {
-    width: '80%',
-    height: 40,
-    padding: 10,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#ccc',
-    marginBottom: 20,
-    borderRadius: 5,
+    margin: 20,
+    padding: 15,
+    width: '90%',
+    borderRadius: 8,
+    fontSize: 16,
   },
-  linkText: {
-    color: '#007BFF',
-    marginBottom: 20,
-  },
-  loginButton: {
-    backgroundColor: '#007BFF',
-    padding: 10,
-    borderRadius: 5,
-  },
-  loginButtonText: {
-    color: '#fff',
-    textAlign: 'center',
+  errorMessage: {
+    color: 'tomato',
+    marginTop: 15,
+    fontSize: 14,
   },
 });
