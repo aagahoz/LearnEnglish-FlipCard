@@ -83,16 +83,16 @@ const UsersPage = () => {
       <Text>isAdmin: {item.isAdmin ? 'Yes' : 'No'}</Text>
       <Text>isActive: {item.isActive ? 'Yes' : 'No'}</Text>
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.actionButton} onPress={() => makeAdmin(item.id)}>
+        <TouchableOpacity style={[styles.actionButton, styles.blueButton]} onPress={() => makeAdmin(item.id)}>
           <Text>Make Admin</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={() => makeUser(item.id)}>
+        <TouchableOpacity style={[styles.actionButton, styles.yellowButton]} onPress={() => makeUser(item.id)}>
           <Text>Make User</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={() => activateUser(item.id)}>
+        <TouchableOpacity style={[styles.actionButton, styles.greenButton]} onPress={() => activateUser(item.id)}>
           <Text>Activate User</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={() => disableUser(item.id)}>
+        <TouchableOpacity style={[styles.actionButton, styles.redButton]} onPress={() => disableUser(item.id)}>
           <Text>Disable User</Text>
         </TouchableOpacity>
       </View>
@@ -140,6 +140,18 @@ const styles = StyleSheet.create({
     padding: 6,
     backgroundColor: '#007BFF',
     borderRadius: 5,
+  },
+  greenButton: {
+    backgroundColor: '#00CC33', // Green color for the specific button
+  },
+  redButton: {
+    backgroundColor: '#CC6633', // Green color for the specific button
+  },
+  blueButton: {
+    backgroundColor: '#ADD8E6', // Green color for the specific button
+  },
+  yellowButton: {
+    backgroundColor: '#CCCC00', // Green color for the specific button
   },
 });
 

@@ -12,6 +12,7 @@ import LearnedScreen from './screens/User/LearnedScreen';
 
 import HomeScreenAdmin from './screens/Admin/HomeScreen';
 import UsersScreen from './screens/Admin/UsersScreen';
+import WordsScreen from './screens/Admin/WordsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,11 +34,14 @@ const App = () => {
         {isSignedIn ? (
           isAdmin ? (
             <>
-              <Tab.Screen name="Home Screen">
+              <Tab.Screen name="Home">
                 {(props) => <HomeScreenAdmin {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
               </Tab.Screen>
               <Tab.Screen name="Users">
                 {(props) => <UsersScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
+              </Tab.Screen>
+              <Tab.Screen name="Words">
+                {(props) => <WordsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
               </Tab.Screen>
               <Tab.Screen name="Settings">
                 {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
@@ -52,7 +56,7 @@ const App = () => {
                 <Tab.Screen name="Profile">
                   {(props) => <ProfileScreen {...props} setIsSignedIn={setIsSignedIn} />}
                 </Tab.Screen>
-                <Tab.Screen name="Learned Words">
+                <Tab.Screen name="Learned">
                   {(props) => <LearnedScreen {...props} setIsSignedIn={setIsSignedIn} />}
                 </Tab.Screen>
                 <Tab.Screen name="Settings">
