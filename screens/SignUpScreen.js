@@ -11,6 +11,9 @@ import {
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
+import { doc, setDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, collection, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export default function SignUp({ navigation, setIsSignedIn }) {
   let [email, setEmail] = useState("");
@@ -18,29 +21,104 @@ export default function SignUp({ navigation, setIsSignedIn }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   let [errorMessage, setErrorMessage] = useState("");
 
-  let signUp = () => {
-    if (email !== "" && password !== "" && confirmPassword !== "") {
-      if (password === confirmPassword) {
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            console.log(userCredential.user);
-            // navigation.navigate("Home", { user: userCredential.user });
-            setIsSignedIn(true);
-            setErrorMessage("");
-            setEmail("");
-            setPassword("");
-            setConfirmPassword('');
-          })
-          .catch((error) => {
-            setErrorMessage(error.message);
-          });
-      } else {
-        setErrorMessage("Passwords do not match");
+  let signUp = async () => {
+    if (email !== "" && password !== "" && confirmPassword !== "")
+    {
+
+      if (await checkEmailExists(email))
+      {
+        console.log("Email Already Exist")
       }
-    } else {
+      else
+      {
+        if (password === confirmPassword)
+        {
+          createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              console.log(userCredential.user);
+              setIsSignedIn(true);
+              setErrorMessage("");
+              setEmail("");
+              setPassword("");
+              setConfirmPassword('');
+              const auth = getAuth(); // Firebase Authentication nesnesini al
+              const user = auth.currentUser; // Oturum açan kullanıcının bilgilerini al
+              addUser(user.uid, email, isAdmin = false, isActive = true);
+            })
+            .catch((error) => {
+              setErrorMessage(error.message);
+            });
+
+        } else
+        {
+          setErrorMessage("Passwords do not match");
+        }
+      }
+    } else
+    {
       setErrorMessage("Please enter an email, password, and confirm password");
     }
   };
+
+
+  const checkEmailExists = async (email) => {
+    try
+    {
+      const firestore = getFirestore();
+      const usersCollection = collection(firestore, 'Users');
+      const querySnapshot = await getDocs(usersCollection);
+
+      // Kullanıcıların içinde gezin
+      for (const doc of querySnapshot.docs)
+      {
+        const userData = doc.data();
+        if (userData.email === email)
+        {
+          // Eğer email adresi bulunduysa, true döndür
+          return true;
+        }
+      }
+
+      // Eğer email adresi bulunamadıysa, false döndür
+      return false;
+    } catch (error)
+    {
+      console.error('Error checking email existence:', error);
+      return false;
+    }
+  };
+
+
+  const addUser = async (userId, email, isAdmin = false, isActive = true) => {
+    try
+    {
+      const firestore = getFirestore();
+      const userRef = doc(firestore, 'Users', userId);
+
+      // Yeni kullanıcı verileri
+      const newUser = {
+        email,
+        isAdmin,
+        isActive,
+      };
+
+      // Belirli bir ID ile "Users" koleksiyonuna kullanıcı ekle
+      await setDoc(userRef, newUser);
+
+      // Eğer başarıyla eklendiyse, kullanıcının ID'sini döndür
+      return userId;
+    } catch (error)
+    {
+      console.error('Error adding user:', error);
+      return null; // Hata durumunda null döndürebilir veya hata yönetimini kendi ihtiyaçlarınıza göre ayarlayabilirsiniz.
+    }
+  };
+
+
+
+
+
+
 
   return (
     <KeyboardAvoidingView
@@ -80,7 +158,7 @@ export default function SignUp({ navigation, setIsSignedIn }) {
       </TouchableOpacity>
       <Text>{errorMessage}</Text>
     </KeyboardAvoidingView>
-    
+
   );
 }
 

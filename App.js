@@ -8,6 +8,7 @@ import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import LearnedScreen from './screens/LearnedSecreen';
 import HomeScreenAdmin from './screens/HomeScreenAdmin';
+import UsersScreen from './screens/UsersScreen';
 
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { addDoc, Timestamp } from 'firebase/firestore';
@@ -40,6 +41,9 @@ const App = () => {
               <Tab.Screen name="Home Screen">
                 {(props) => <HomeScreenAdmin {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
               </Tab.Screen>
+              <Tab.Screen name="Users">
+                {(props) => <UsersScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
+              </Tab.Screen>
               <Tab.Screen name="Settings">
                 {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
               </Tab.Screen>
@@ -63,10 +67,10 @@ const App = () => {
               </>
             )) : (
           <>
-            <Tab.Screen name="SignIn">
+            <Tab.Screen name="Sign In">
               {(props) => <SignInScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin}  />}
             </Tab.Screen>
-            <Tab.Screen name="SignUp">
+            <Tab.Screen name="Sign Up">
               {(props) => <SignUpScreen {...props} setIsSignedIn={() => setIsSignedIn(true)} setIsAdmin={() => setIsAdmin(true)}  />}
             </Tab.Screen>
           </>
