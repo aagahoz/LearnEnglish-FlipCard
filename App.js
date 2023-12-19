@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './screens/HomeScreen';
-import ProfileScreen from './screens/ProfileScreen';
-import SettingsScreen from './screens/SettingsScreen';
+
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
-import LearnedScreen from './screens/LearnedSecreen';
-import HomeScreenAdmin from './screens/HomeScreenAdmin';
-import UsersScreen from './screens/UsersScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { addDoc, Timestamp } from 'firebase/firestore';
-import { doc, deleteDoc } from 'firebase/firestore';
-import { updateDoc } from 'firebase/firestore';
+import HomeScreenUser from './screens/User/HomeScreen';
+import ProfileScreen from './screens/User/ProfileScreen';
+import LearnedScreen from './screens/User/LearnedScreen';
 
-import db from './firebaseConfig'
-
+import HomeScreenAdmin from './screens/Admin/HomeScreen';
+import UsersScreen from './screens/Admin/UsersScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -52,7 +47,7 @@ const App = () => {
             (
               <>
                 <Tab.Screen name="Home">
-                  {(props) => <HomeScreen {...props} setIsSignedIn={setIsSignedIn} />}
+                  {(props) => <HomeScreenUser {...props} setIsSignedIn={setIsSignedIn} />}
                 </Tab.Screen>
                 <Tab.Screen name="Profile">
                   {(props) => <ProfileScreen {...props} setIsSignedIn={setIsSignedIn} />}
