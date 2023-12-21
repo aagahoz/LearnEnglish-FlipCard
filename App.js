@@ -13,20 +13,24 @@ import LearnedScreen from './screens/User/LearnedScreen';
 import HomeScreenAdmin from './screens/Admin/HomeScreen';
 import UsersScreen from './screens/Admin/UsersScreen';
 import WordsScreen from './screens/Admin/WordsScreen';
+import AddWordScreen from './screens/Admin/AddWordScreen';
 
 const Tab = createBottomTabNavigator();
 
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAddedWord, setIsAddedWord] = useState(false);
+  
 
+  
 
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
           tabBarLabelStyle: {
-            fontSize: 16,
+            fontSize: 13,
             fontWeight: 'bold',
           },
         }}
@@ -42,6 +46,9 @@ const App = () => {
               </Tab.Screen>
               <Tab.Screen name="Words">
                 {(props) => <WordsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
+              </Tab.Screen>
+              <Tab.Screen name="Add Word">
+                {(props) => <AddWordScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
               </Tab.Screen>
               <Tab.Screen name="Settings">
                 {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
@@ -67,10 +74,10 @@ const App = () => {
             )) : (
           <>
             <Tab.Screen name="Sign In">
-              {(props) => <SignInScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin}  />}
+              {(props) => <SignInScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
             </Tab.Screen>
             <Tab.Screen name="Sign Up">
-              {(props) => <SignUpScreen {...props} setIsSignedIn={() => setIsSignedIn(true)} setIsAdmin={() => setIsAdmin(true)}  />}
+              {(props) => <SignUpScreen {...props} setIsSignedIn={() => setIsSignedIn(true)} setIsAdmin={() => setIsAdmin(true)} />}
             </Tab.Screen>
           </>
         )}

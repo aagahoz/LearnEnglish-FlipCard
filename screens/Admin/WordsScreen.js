@@ -2,48 +2,44 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-const wordsPage = () => {
+const WordsPage = () => {
   const [words, setWords] = useState([]);
 
   useEffect(() => {
-    const fetchWords = async () => {
-      try {
-        const firestore = getFirestore();
-        const WordsCollection = collection(firestore, 'Words');
-        const wordsSnapshot = await getDocs(WordsCollection);
-        const wordsData = wordsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setWords(wordsData);
-      } catch (error) {
-        console.error('Error fetching words:', error);
-      }
-    };
-
     fetchWords();
   }, []);
 
-  const  activateWord = async (wordsId) => {
+  const fetchWords = async () => {
     try {
       const firestore = getFirestore();
-      const wordsRef = doc(firestore, 'Words', wordsId);
-    //   await deleteDoc(wordsRef);
-      await updateDoc(wordsRef, { isActive: true });
-      updateLocalwords(wordsId, { isActive: true });
-
+      const WordsCollection = collection(firestore, 'Words');
+      const wordsSnapshot = await getDocs(WordsCollection);
+      const wordsData = wordsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setWords(wordsData);
     } catch (error) {
-      console.error('Error deleting word:', error);
+      console.error('Error fetching words:', error);
     }
   };
 
-  const  disableWord = async (wordsId) => {
+  const activateWord = async (wordsId) => {
     try {
       const firestore = getFirestore();
       const wordsRef = doc(firestore, 'Words', wordsId);
-    //   await deleteDoc(wordsRef);
+      await updateDoc(wordsRef, { isActive: true });
+      updateLocalwords(wordsId, { isActive: true });
+    } catch (error) {
+      console.error('Error activating word:', error);
+    }
+  };
+
+  const disableWord = async (wordsId) => {
+    try {
+      const firestore = getFirestore();
+      const wordsRef = doc(firestore, 'Words', wordsId);
       await updateDoc(wordsRef, { isActive: false });
       updateLocalwords(wordsId, { isActive: false });
-
     } catch (error) {
-      console.error('Error deleting word:', error);
+      console.error('Error disabling word:', error);
     }
   };
 
@@ -52,7 +48,11 @@ const wordsPage = () => {
       prevwordss.map((words) => (words.id === wordsId ? { ...words, ...newData } : words))
     );
   };
- 
+
+  const handleRefresh = () => {
+    fetchWords();
+  };
+
 
   const renderItem = ({ item }) => (
     <View style={styles.wordItem}>
@@ -74,7 +74,14 @@ const wordsPage = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Words List</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Words List</Text>
+      </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleRefresh} style={styles.refreshButton}>
+          <Text>Refresh</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={words}
         keyExtractor={(item) => item.id}
@@ -83,9 +90,11 @@ const wordsPage = () => {
       />
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
     alignItems: 'center',
@@ -148,6 +157,20 @@ const styles = StyleSheet.create({
   redButton: {
     backgroundColor: '#CC6633', // Red color for the specific button
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Yatayda ortala
+    width: '100%',
+    marginBottom: 5,
+  },
+  refreshButton: {
+    marginTop: 0, // Refresh butonunu yukarı kaydır
+    padding: 10,
+    backgroundColor: '#4CAF50', // Yeni renk
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2E7D32', // Yeni kenarlık rengi
+  },
 });
 
-export default wordsPage;
+export default WordsPage;
