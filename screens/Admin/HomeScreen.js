@@ -5,7 +5,7 @@ import { View, Text, StyleSheet } from 'react-native';
 const App = () => {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Admin Page</Text>
+        <Text style={styles.text}>Welcome to Admin Panel</Text>
       </View>
     );
   };
@@ -15,6 +15,7 @@ const App = () => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      backgroundColor:'#fff'
     },
     text: {
       fontSize: 24,

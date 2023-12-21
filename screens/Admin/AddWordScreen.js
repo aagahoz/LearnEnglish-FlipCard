@@ -12,15 +12,13 @@ const AddWordPage = ({ navigation, setWord }) => {
 
     useEffect(() => {
         const fetchWords = async () => {
-            try
-            {
+            try {
                 const firestore = getFirestore();
                 const WordsCollection = collection(firestore, 'Words');
                 const wordsSnapshot = await getDocs(WordsCollection);
                 const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
                 setExistingWords(wordsData);
-            } catch (error)
-            {
+            } catch (error) {
                 console.error('Error fetching existing words:', error);
             }
         };
@@ -42,7 +40,7 @@ const AddWordPage = ({ navigation, setWord }) => {
         try {
             const isEngExists = existingWords.some((word) => word.eng === eng);
             const isTrExists = existingWords.some((word) => word.tr === tr);
-    
+
             if (isEngExists || isTrExists) {
                 setFeedbackMessage('Error: Word already exists in the table');
             } else {
@@ -50,17 +48,20 @@ const AddWordPage = ({ navigation, setWord }) => {
                 const WordsCollection = collection(firestore, 'Words');
                 const newWordRef = await addDoc(WordsCollection, { eng, tr, isActive: true });
                 setFeedbackMessage('New Word Added: ' + eng + ' - ' + tr);
+                setTr('');
+                setEng('');
+                // Kelime eklenirse, existingWords'ü güncelle
+                setExistingWords((prevWords) => [...prevWords, { eng, tr, isActive: true }]);
             }
         } catch (error) {
             console.error('Error adding word:', error);
             setFeedbackMessage('Error: Word could not be added');
         }
     };
-    
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Add New Word</Text>
+            <Text style={styles.title}>Add a New Word</Text>
             <TextInput
                 style={styles.input}
                 placeholder="English"
@@ -83,10 +84,10 @@ const AddWordPage = ({ navigation, setWord }) => {
             }}>
                 {feedbackMessage}
             </Text>
-
         </View>
     );
 };
+
 
 
 const styles = StyleSheet.create({
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingTop: 20,
+        backgroundColor: '#fff',
     },
     title: {
         fontSize: 24,
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
         height: 40,
         padding: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: 'gray',
         marginBottom: 20,
         borderRadius: 5,
     },

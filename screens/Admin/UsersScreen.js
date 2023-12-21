@@ -101,7 +101,7 @@ const UsersPage = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>User List</Text>
+      <Text style={styles.title}>Users List</Text>
       <FlatList
         data={users}
         keyExtractor={(item) => item.id}
@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: 20,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
@@ -127,8 +128,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   userItem: {
-    padding: 20,
-    borderBottomWidth: 1,
+    padding: 8,
+    borderBottomWidth: 5,
     borderBottomColor: '#ccc',
   },
   actionsContainer: {
@@ -136,9 +137,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   actionButton: {
-    marginRight: 10,
-    padding: 6,
-    backgroundColor: '#007BFF',
+    marginRight: 5,
+    padding: 4,
     borderRadius: 5,
   },
   greenButton: {

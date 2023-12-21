@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: 20,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
   refreshButton: {
     marginTop: 0, // Refresh butonunu yukarı kaydır
     padding: 10,
-    backgroundColor: '#4CAF50', // Yeni renk
+    backgroundColor: '#33CCCC', // Yeni renk
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#2E7D32', // Yeni kenarlık rengi
