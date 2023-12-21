@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // Expo kullanıyorsanız bu satırı ekleyin
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
@@ -9,6 +9,7 @@ import SettingsScreen from './screens/SettingsScreen';
 
 import HomeScreenUser from './screens/User/HomeScreen';
 import ProfileScreen from './screens/User/ProfileScreen';
+import PlayScreen from './screens/User/PlayScreen';
 import LearnedScreen from './screens/User/LearnedScreen';
 
 import HomeScreenAdmin from './screens/Admin/HomeScreen';
@@ -33,23 +34,36 @@ const App = () => {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
-            if (route.name === 'Home') {
+            if (route.name === 'Home')
+            {
               iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Users') {
+            } else if (route.name === 'Users')
+            {
               iconName = focused ? 'account-group' : 'account-group-outline';
-            } else if (route.name === 'Words') {
+            } else if (route.name === 'Words')
+            {
               iconName = focused ? 'book' : 'book-outline';
-            } else if (route.name === 'Add Word') {
+            } else if (route.name === 'Add Word')
+            {
               iconName = focused ? 'plus-circle' : 'plus-circle-outline';
-            } else if (route.name === 'Settings') {
+            } else if (route.name === 'Settings')
+            {
               iconName = focused ? 'cog' : 'cog-outline';
-            } else if (route.name === 'Profile') {
+            } else if (route.name === 'Profile')
+            {
               iconName = focused ? 'account' : 'account-outline';
-            } else if (route.name === 'Learned') {
+            }
+            else if (route.name === 'Play')
+            {
+              iconName = focused ? 'play' : 'play-outline';
+            } else if (route.name === 'Learned')
+            {
               iconName = focused ? 'check' : 'check-outline';
-            } else if (route.name === 'Sign In') {
+            } else if (route.name === 'Sign In')
+            {
               iconName = focused ? 'login' : 'login-variant';
-            } else if (route.name === 'Sign Up') {
+            } else if (route.name === 'Sign Up')
+            {
               iconName = focused ? 'account-plus' : 'account-plus-outline';
             }
 
@@ -83,6 +97,9 @@ const App = () => {
               </Tab.Screen>
               <Tab.Screen name="Profile">
                 {(props) => <ProfileScreen {...props} setIsSignedIn={setIsSignedIn} />}
+              </Tab.Screen>
+              <Tab.Screen name="Play">
+                {(props) => <PlayScreen {...props} setIsSignedIn={setIsSignedIn} />}
               </Tab.Screen>
               <Tab.Screen name="Learned">
                 {(props) => <LearnedScreen {...props} setIsSignedIn={setIsSignedIn} />}
