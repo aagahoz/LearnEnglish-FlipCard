@@ -16,7 +16,7 @@
 ![ezgif com-video-to-gif-converted](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/daa5d4ec-731c-47a0-b129-fa66e82840b2)
 
 #### Sign In Screen
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/95c815b8-bcb3-4276-8b15-1cf63835a680)
+![Screenshot 2023-12-23 at 00 10 31](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/79fdd21d-21e6-4935-a52c-24f1b1d73ef7)
 
 #### Sign Up Screen
 ![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/361d25f2-4762-4d82-b9f1-9d43be7460c7)
