@@ -28,7 +28,7 @@ const App = () => {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarLabelStyle: {
-            fontSize: 13,
+            fontSize: 16,
             fontWeight: 'bold',
           },
           tabBarIcon: ({ focused, color, size }) => {
@@ -53,7 +53,7 @@ const App = () => {
             {
               iconName = focused ? 'account' : 'account-outline';
             }
-            else if (route.name === 'Play')
+            else if (route.name === 'Learn')
             {
               iconName = focused ? 'play' : 'play-outline';
             } else if (route.name === 'Learned')
@@ -98,7 +98,7 @@ const App = () => {
               <Tab.Screen name="Profile">
                 {(props) => <ProfileScreen {...props} setIsSignedIn={setIsSignedIn} />}
               </Tab.Screen>
-              <Tab.Screen name="Play">
+              <Tab.Screen name="Learn">
                 {(props) => <PlayScreen {...props} setIsSignedIn={setIsSignedIn} />}
               </Tab.Screen>
               <Tab.Screen name="Learned">

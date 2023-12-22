@@ -27,8 +27,8 @@ const PlayPage = () => {
     }
   };
 
-  const addToFavorites = () => {
-    // Implement your logic here
+  const addToLearned = () => {
+    console.log('Kelime Eklendi'); // ! Bu fonksiyonu düzelt
   };
 
   const toggleDisplayLanguage = () => {
@@ -38,22 +38,22 @@ const PlayPage = () => {
   };
 
   const goNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex < words.length - 1 ? prevIndex + 1 : 0));
-    setIsFlipped(false);
-    setDisplayEnglish(true);
-    console.log(words[currentIndex]?.tr);
+    if (currentIndex < words.length - 1) {
+      setCurrentIndex((prevIndex) => prevIndex + 1);
+      setIsFlipped(false);
+    }
   };
 
   const goBack = () => {
-    setCurrentIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : words.length - 1));
-    setIsFlipped(false);
-    setDisplayEnglish(true);
-    console.log(words[currentIndex]?.tr);
+    if (currentIndex > 0) {
+      setCurrentIndex((prevIndex) => prevIndex - 1);
+      setIsFlipped(false);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={addToFavorites} style={styles.favoritesButton}>
+      <TouchableOpacity onPress={addToLearned} style={styles.learnedButton}>
         <Text style={styles.buttonText}>add to learned</Text>
       </TouchableOpacity>
 
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white',
   },
-  favoritesButton: {
+  learnedButton: {
     padding: 10,
     borderRadius: 5,
     alignSelf: 'flex-end',
@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     textAlign: 'center',
+    fontSize: 16,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -125,6 +126,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#999999',
     borderRadius: 5,
     width: '35%',
+    marginLeft: 30,
+    marginRight: 20,
+    
   },
   cardContainer: {
     width: 200,
