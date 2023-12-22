@@ -44,8 +44,8 @@
 #### Proje dosyalarını indirin:
 
 ```bash
-git clone https://github.com/kullaniciadi/proje-adi.git
-cd proje-adi
+git clone https://github.com/aagahoz/LearnEnglish-FlipCard.git
+cd LearnEnglish-FlipCard-main/
 ```
 #### Bağımlılıkları yükleyin:
 
