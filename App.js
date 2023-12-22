@@ -11,6 +11,8 @@ import HomeScreenUser from './screens/User/HomeScreen';
 import ProfileScreen from './screens/User/ProfileScreen';
 import PlayScreen from './screens/User/PlayScreen';
 import LearnedScreen from './screens/User/LearnedScreen';
+import FavoritesScreen from './screens/User/FavoritesScreen';
+import UnLearnedScreen from './screens/User/UnLearnedScreen';
 
 import HomeScreenAdmin from './screens/Admin/HomeScreen';
 import UsersScreen from './screens/Admin/UsersScreen';
@@ -28,7 +30,7 @@ const App = () => {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarLabelStyle: {
-            fontSize: 16,
+            fontSize: 13,
             fontWeight: 'bold',
           },
           tabBarIcon: ({ focused, color, size }) => {
@@ -53,6 +55,14 @@ const App = () => {
             {
               iconName = focused ? 'account' : 'account-outline';
             }
+            else if (route.name === 'Favorites')
+            {
+              iconName = focused ? 'heart' : 'heart-outline';
+            }
+            else if (route.name === 'UnLearned')
+            {
+              iconName = focused ? 'book' : 'book-outline';
+            }
             else if (route.name === 'Learn')
             {
               iconName = focused ? 'play' : 'play-outline';
@@ -66,7 +76,6 @@ const App = () => {
             {
               iconName = focused ? 'account-plus' : 'account-plus-outline';
             }
-
             return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
           },
         })}
@@ -92,11 +101,11 @@ const App = () => {
             </>
           ) : (
             <>
-              <Tab.Screen name="Home">
-                {(props) => <HomeScreenUser {...props} setIsSignedIn={setIsSignedIn} />}
+              <Tab.Screen name="Favorites">
+                {(props) => <FavoritesScreen {...props} setIsSignedIn={setIsSignedIn} />}
               </Tab.Screen>
-              <Tab.Screen name="Profile">
-                {(props) => <ProfileScreen {...props} setIsSignedIn={setIsSignedIn} />}
+              <Tab.Screen name="UnLearned">
+                {(props) => <UnLearnedScreen {...props} setIsSignedIn={setIsSignedIn} />}
               </Tab.Screen>
               <Tab.Screen name="Learn">
                 {(props) => <PlayScreen {...props} setIsSignedIn={setIsSignedIn} />}
