@@ -3,7 +3,9 @@
 #### Bu proje, React Native kullanılarak geliştirilmiş bir İngilizce öğrenme uygulamasını içermektedir. Uygulama, kelime kartları üzerinden bir "flip card" mantığı ile çalışmaktadır, bu da kullanıcıların hem kelime bilgisini hem de kelimenin karşılığını öğrenmelerine olanak tanır.
 
 ### Özellikler
-* Kelime kartlarıyla etkileşimli öğrenme
+* Kimlik Doğrulama (Authentication), Yetkilendirme(Authorization)
+* Admin paneli ile kayıtlı kullanıcı ve kelimeleri yönetme
+* Kullanıcı paneli ile Favoriye alınmış, öğrenilmiş, öğrenilmemiş, yeni kelime öğren gibi ekranlar
 
 ### Ekran Görüntüleri
 
