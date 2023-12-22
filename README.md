@@ -4,9 +4,6 @@
 
 ### Özellikler
 * Kelime kartlarıyla etkileşimli öğrenme
-* Flip card mantığı ile kelime ve anlamı gösterme
-* Uygulama içi ekran görüntüleri
-
 
 ### Ekran Görüntüleri
 
@@ -31,6 +28,10 @@
 ##### Add Word Screen ( Admin )
 ![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/ddca8a8d-97b7-4c52-a7ec-423d4de1de7f)
 
+
+### Kullanılan Teknolojiler
+* React Native
+* Firebase
 
 ### Gereksinimler
 * Node.js
