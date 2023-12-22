@@ -11,10 +11,10 @@
 ### Ekran Görüntüleri
 
 ##### Sign In Screen
-![Sign In Screen](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/95c815b8-bcb3-4276-8b15-1cf63835a680 "Sign In Screen")
+![Sign In Screen](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/95c815b8-bcb3-4276-8b15-1cf63835a680 "Sign In Screen")   ![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/361d25f2-4762-4d82-b9f1-9d43be7460c7)
+
 
 ##### Sign Up Screen
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/361d25f2-4762-4d82-b9f1-9d43be7460c7)
 
 ##### Learn Screen
 ![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/d36e5f50-73db-4f30-b807-f1e83a30cd35)
