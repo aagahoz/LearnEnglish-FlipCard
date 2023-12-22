@@ -2,12 +2,18 @@
 
 #### Bu proje, React Native kullanılarak geliştirilmiş bir İngilizce öğrenme uygulamasını içermektedir. Uygulama, kelime kartları üzerinden bir "flip card" mantığı ile çalışmaktadır, bu da kullanıcıların hem kelime bilgisini hem de kelimenin karşılığını öğrenmelerine olanak tanır.
 
+
 ### Özellikler
 * Kimlik Doğrulama (Authentication), Yetkilendirme(Authorization)
 * Admin paneli ile kayıtlı kullanıcı ve kelimeleri yönetme
 * Kullanıcı paneli ile Favoriye alınmış, öğrenilmiş, öğrenilmemiş, yeni kelime öğren gibi ekranlar
 
+
 ### Ekran Görüntüleri
+
+
+## Flip Card
+![ezgif com-video-to-gif-converted](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/daa5d4ec-731c-47a0-b129-fa66e82840b2)
 
 #### Sign In Screen
 ![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/95c815b8-bcb3-4276-8b15-1cf63835a680)
@@ -35,11 +41,13 @@
 * React Native
 * Firebase
 
+
 ### Gereksinimler
 * Node.js
 * npm (Node.js ile birlikte gelir)
 * Expo Go
 * Android Studio / Xcode (bağlantılı platforma göre)
+
 
 #### Proje dosyalarını indirin:
 
