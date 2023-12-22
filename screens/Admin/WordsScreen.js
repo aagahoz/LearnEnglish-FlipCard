@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 const WordsPage = () => {
   const [words, setWords] = useState([]);
@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    flexDirection: 'column', // Dikey sıralama
-    alignItems: 'center', // Ortalamak için
+    flexDirection: 'column', 
+    alignItems: 'center', 
   },
   wordText: {
     fontSize: 16,
@@ -126,25 +126,25 @@ const styles = StyleSheet.create({
   wordEngTrContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%', // Genişliği yüzde 100 yap
+    width: '100%', 
     marginBottom: 5,
   },
   wordEng: {
-    color: '#007BFF', // Blue color for English text
+    color: '#007BFF',
     marginRight: 10,
   },
   wordTr: {
-    color: '#00CC33', // Green color for Turkish text
-    flex: 1, // Eng kısmını genişletir
+    color: '#00CC33', 
+    flex: 1, 
   },
   wordIsActive: {
-    color: '#CC0099', // 
-    flex: 1, // 
+    color: '#CC0099',
+    flex: 1, 
   },
   actionsContainer: {
     flexDirection: 'row',
     marginTop: 10,
-    justifyContent: 'flex-end', // Sağa yaslamak için
+    justifyContent: 'flex-end', 
   },
   actionButton: {
     marginRight: 10,
@@ -153,24 +153,24 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   greenButton: {
-    backgroundColor: '#00CC33', // Green color for the specific button
+    backgroundColor: '#00CC33', 
   },
   redButton: {
-    backgroundColor: '#CC6633', // Red color for the specific button
+    backgroundColor: '#CC6633', 
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'center', // Yatayda ortala
+    justifyContent: 'center',
     width: '100%',
     marginBottom: 5,
   },
   refreshButton: {
-    marginTop: 0, // Refresh butonunu yukarı kaydır
+    marginTop: 0,
     padding: 10,
-    backgroundColor: '#33CCCC', // Yeni renk
+    backgroundColor: '#33CCCC', 
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#2E7D32', // Yeni kenarlık rengi
+    borderColor: '#2E7D32',
   },
 });
 

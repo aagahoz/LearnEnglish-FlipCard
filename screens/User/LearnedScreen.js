@@ -58,10 +58,8 @@ const LearnedPage = () => {
           }
         });
 
-        // Tüm belgelerin çekilmesini bekleyin
         const wordsData = await Promise.all(wordsPromises);
 
-        // Boş olmayan belgeleri learnedWordsData state'ine ekleyin
         setLearnedWordsData(wordsData.filter((word) => word !== null));
       }
     } catch (error)
@@ -197,7 +195,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black', // veya '#000'
+    color: 'black',
   },
 });
 

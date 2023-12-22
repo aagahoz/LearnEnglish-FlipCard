@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-nativ
 import { signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
 
-export default function SettingsScreen({ setIsSignedIn }) {
+export default function SettingsPage ({ setIsSignedIn }) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,27 +21,23 @@ export default function SettingsScreen({ setIsSignedIn }) {
 
   const handleChangePassword = async () => {
     try {
-      setError(''); // Clear any previous error messages
-      setSuccessMessage(''); // Clear any previous success messages
+      setError(''); 
+      setSuccessMessage(''); 
 
-      // Reauthenticate the user with their current credentials
       const user = auth.currentUser;
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
 
-      // Check if the new password is the same as the current password
       if (currentPassword === newPassword) {
         setError('New password must be different from the current password.');
         return;
       }
 
-      // Check if the new password matches the confirmation password
       if (newPassword !== confirmPassword) {
         setError('New password and confirmation password do not match.');
         return;
       }
 
-      // Update the user's password
       await updatePassword(user, newPassword);
       setSuccessMessage('Password changed successfully!');
       setCurrentPassword('');

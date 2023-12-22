@@ -57,13 +57,10 @@ const unLearnedPage = () => {
           }
         });
 
-        // Tüm belgelerin çekilmesini bekleyin
         const wordsData = await Promise.all(wordsPromises);
 
-        // Boş olmayan belgeleri learnedWordsData state'ine ekleyin
         setLearnedWordsData(wordsData.filter((word) => word !== null));
 
-        // İD'leri bulun ve yazdırın
         const allWordsQuery = query(collection(firestore, 'Words'));
         const allWordsSnapshot = await getDocs(allWordsQuery);
         const allWordIds = allWordsSnapshot.docs.map((doc) => doc.id);
@@ -200,7 +197,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black', // veya '#000'
+    color: 'black',
   },
 });
 

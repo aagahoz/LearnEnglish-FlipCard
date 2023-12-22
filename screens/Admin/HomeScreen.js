@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-
-const App = () => {
+const HomePage = () => {
     return (
       <View style={styles.container}>
         <Text style={styles.text}>Welcome to Admin Panel</Text>
@@ -23,4 +22,4 @@ const App = () => {
     },
   });
   
-  export default App;
+  export default HomePage;

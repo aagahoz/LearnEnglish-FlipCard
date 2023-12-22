@@ -1,4 +1,3 @@
-// AddWordPage.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { getFirestore, getDocs, collection, addDoc } from 'firebase/firestore';
@@ -24,17 +23,15 @@ const AddWordPage = ({ navigation, setWord }) => {
         };
 
         const focusListener = navigation.addListener('focus', () => {
-            // Sayfa her odaklandığında bu blok çalışacak
-            setEng(''); // İlk input'u temizle
-            setTr(''); // İkinci input'u temizle
-            setFeedbackMessage(''); // Feedback mesajını temizle
+            setEng(''); 
+            setTr(''); 
+            setFeedbackMessage(''); 
         });
 
         return () => {
-            // Temizlik işlemleri
             focusListener();
         };
-    }, [navigation]); // navigation bağımlılığı ekleyin
+    }, [navigation]); 
 
     const addWord = async () => {
         try {
@@ -50,7 +47,7 @@ const AddWordPage = ({ navigation, setWord }) => {
                 setFeedbackMessage('New Word Added: ' + eng + ' - ' + tr);
                 setTr('');
                 setEng('');
-                // Kelime eklenirse, existingWords'ü güncelle
+
                 setExistingWords((prevWords) => [...prevWords, { eng, tr, isActive: true }]);
             }
         } catch (error) {

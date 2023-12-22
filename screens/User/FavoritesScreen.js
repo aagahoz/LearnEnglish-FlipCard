@@ -4,7 +4,7 @@ import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-const FavoritesScreen = () => {
+const FavoritePage = () => {
   const [userData, setUserData] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
   const [favoritesWordsData, setfavoritesWordsData] = useState([]);
@@ -58,11 +58,8 @@ const FavoritesScreen = () => {
           }
         });
 
-
-        // Tüm belgelerin çekilmesini bekleyin
         const wordsData = await Promise.all(wordsPromises);
 
-        // Boş olmayan belgeleri favoritesWordsData state'ine ekleyin
         setfavoritesWordsData(wordsData.filter((word) => word !== null));
       }
     } catch (error)
@@ -84,14 +81,14 @@ const FavoritesScreen = () => {
   const goNext = () => {
     if (currentIndex < favoritesWordsData.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
-      setIsFlipped(false); // Kartı kapalı (default) konumuna getir
+      setIsFlipped(false);
     }
   };
 
   const goBack = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prevIndex) => prevIndex - 1);
-      setIsFlipped(false); // Kartı kapalı (default) konumuna getir
+      setIsFlipped(false);
     }
   };
 
@@ -202,4 +199,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FavoritesScreen;
+export default FavoritePage;

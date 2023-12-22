@@ -1,5 +1,4 @@
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
@@ -13,9 +12,9 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
 import { doc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, collection, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 
-export default function SignUp({ navigation, setIsSignedIn }) {
+export default function SignUpPage ({ navigation, setIsSignedIn }) {
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -114,12 +113,6 @@ export default function SignUp({ navigation, setIsSignedIn }) {
     }
   };
 
-
-
-
-
-
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -150,7 +143,7 @@ export default function SignUp({ navigation, setIsSignedIn }) {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Sign In')}>
         <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.signUpButton} onPress={signUp}>

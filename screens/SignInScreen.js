@@ -5,15 +5,13 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
   StyleSheet,
 } from 'react-native';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebaseConfig'; // Firebase projenizin Firebase Authentication bağlantısını içeren bir dosya
-import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { auth } from '../firebaseConfig';
+import { getFirestore, collection, getDocs, getDoc, doc } from 'firebase/firestore';
 
-export default function SignUp({ navigation, setIsSignedIn, setIsAdmin }) {
+export default function SignInPage ({ navigation, setIsSignedIn, setIsAdmin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -31,11 +29,9 @@ export default function SignUp({ navigation, setIsSignedIn, setIsAdmin }) {
         }
         else
         {
-        // Firebase Authentication ile oturum açma
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const userId = userCredential.user.uid;
 
-        // Firestore'da kullanıcının varlığını kontrol etme
         const firestore = getFirestore();
         const userDocRef = doc(firestore, 'Users', userId);
         const userDocSnapshot = await getDoc(userDocRef);
@@ -47,7 +43,7 @@ export default function SignUp({ navigation, setIsSignedIn, setIsAdmin }) {
           {
             console.log('isAdmin:', userData.isAdmin);
             setIsSignedIn(true);
-            setIsAdmin(userData.isAdmin === true); // Eğer isAdmin true ise, setIsAdmin değerini true yap
+            setIsAdmin(userData.isAdmin === true);
           } else
           {
             console.log('User document does not have isAdmin field');
@@ -60,7 +56,6 @@ export default function SignUp({ navigation, setIsSignedIn, setIsAdmin }) {
         }
       }
 
-        // İşlemler başarılıysa, başka bir ekrana yönlendirme vb. yapabilirsiniz.
       } catch (error)
       {
         setErrorMessage(error.message);
@@ -84,12 +79,10 @@ export default function SignUp({ navigation, setIsSignedIn, setIsAdmin }) {
         const userData = doc.data();
         if (userData.email === email)
         {
-          // Eğer email adresi bulunduysa, isActive değerini kontrol et
           return userData.isActive;
         }
       }
 
-      // Eğer email adresi bulunamadıysa veya isActive değeri yoksa, varsayılan olarak false döndür
       return false;
     } catch (error)
     {
@@ -101,7 +94,7 @@ export default function SignUp({ navigation, setIsSignedIn, setIsAdmin }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login Screen</Text>
+      <Text style={styles.title}>Log In</Text>
       <TextInput
         placeholder="Email"
         value={email}

@@ -7,8 +7,6 @@ import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
-import HomeScreenUser from './screens/User/HomeScreen';
-import ProfileScreen from './screens/User/ProfileScreen';
 import PlayScreen from './screens/User/PlayScreen';
 import LearnedScreen from './screens/User/LearnedScreen';
 import FavoritesScreen from './screens/User/FavoritesScreen';

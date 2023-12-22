@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
@@ -142,16 +142,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   greenButton: {
-    backgroundColor: '#00CC33', // Green color for the specific button
+    backgroundColor: '#00CC33', 
   },
   redButton: {
-    backgroundColor: '#CC6633', // Green color for the specific button
+    backgroundColor: '#CC6633', 
   },
   blueButton: {
-    backgroundColor: '#ADD8E6', // Green color for the specific button
+    backgroundColor: '#ADD8E6', 
   },
   yellowButton: {
-    backgroundColor: '#CCCC00', // Green color for the specific button
+    backgroundColor: '#CCCC00', 
   },
 });
 
