@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const LearnedPage = () => {
   const [userData, setUserData] = useState(null);
@@ -11,6 +12,8 @@ const LearnedPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [displayEnglish, setDisplayEnglish] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLearned, setIsLearned] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
@@ -68,9 +71,7 @@ const LearnedPage = () => {
     }
   };
 
-  const removeWord = () => {
-    console.log('Kelime Çıkarıldı'); // ! Bu fonksiyonu düzelt
-  };
+
 
   const toggleDisplayLanguage = () => {
     setIsFlipped(true);
@@ -79,32 +80,64 @@ const LearnedPage = () => {
   };
 
   const goNext = () => {
-    if (currentIndex < learnedWordsData.length - 1) {
+    if (currentIndex < learnedWordsData.length - 1)
+    {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false); // Kartı kapalı (default) konumuna getir
     }
   };
 
   const goBack = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false); // Kartı kapalı (default) konumuna getir
     }
   };
 
+  const removeWord = () => {
+    console.log('Kelime Çıkarıldı');
+    if (isLearned)
+    {
+      setIsLearned(false);
+    }
+    else
+    {
+      setIsLearned(true);
+    }
+  };
+
+  const favoriteButton = () => {
+    console.log('Favorilere Eklendi');
+    if (isFavorite)
+    {
+      setIsFavorite(false);
+    }
+    else
+    {
+      setIsFavorite(true);
+    }
+  }
+
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={removeWord} style={styles.removeButton}>
-        <Text style={styles.buttonText}>Remove</Text>
-      </TouchableOpacity>
+      <Text style={{ marginBottom: 20 }}>
+        <TouchableOpacity onPress={favoriteButton}>
+          <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={removeWord}>
+          <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
+        </TouchableOpacity>
+      </Text>
 
       <FlipCard
         style={styles.cardContainer}
         friction={2.4}
         perspective={1000}
         flipHorizontal={true}
-        flipVertical={false} 
+        flipVertical={false}
         flip={isFlipped}        // ! goBack ve goNext fonksiyonlarında kartı face (default) konumuna getirme sorunu var.
         clickable={true}
         onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
@@ -141,7 +174,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems:'center',
+    alignItems: 'center',
     padding: 20,
     backgroundColor: 'white',
   },
@@ -170,13 +203,13 @@ const styles = StyleSheet.create({
     width: '35%',
     marginLeft: 30,
     marginRight: 20,
-    
+
   },
   cardContainer: {
     width: 200,
     height: 300,
     justifyContent: 'center',
-    marginBottom: 50, 
+    marginBottom: 50,
   },
   card: {
     flex: 1,

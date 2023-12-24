@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // ! Unlearned Wordleri id ile çekip cardta gösterme eksik
 
@@ -14,16 +15,20 @@ const unLearnedPage = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [displayEnglish, setDisplayEnglish] = useState(true);
   const [unLearnedWordIds, setUnLearnedWordIds] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLearned, setIsLearned] = useState(false);
 
 
   useEffect(() => {
     const auth = getAuth();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if (user)
+      {
         setUserEmail(user.email);
         fetchUserData(user.email);
-      } else {
+      } else
+      {
         setUserEmail(null);
         setUserData(null);
         setLearnedWordsData([]);
@@ -35,13 +40,15 @@ const unLearnedPage = () => {
   }, []);
 
   const fetchUserData = async (email) => {
-    try {
+    try
+    {
       const firestore = getFirestore();
 
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
       const userQuerySnapshot = await getDocs(userQuery);
 
-      if (userQuerySnapshot.size > 0) {
+      if (userQuerySnapshot.size > 0)
+      {
         const userData = userQuerySnapshot.docs[0].data();
         setUserData(userData);
 
@@ -50,9 +57,11 @@ const unLearnedPage = () => {
           const wordDocRef = doc(firestore, 'Words', wordId);
           const wordDocSnapshot = await getDoc(wordDocRef);
 
-          if (wordDocSnapshot.exists()) {
+          if (wordDocSnapshot.exists())
+          {
             return wordDocSnapshot.data();
-          } else {
+          } else
+          {
             return null;
           }
         });
@@ -68,23 +77,22 @@ const unLearnedPage = () => {
         setUnLearnedWordIds(allWordIds.filter((wordId) => !learnedWordsIds.includes(wordId)));
         console.log('Unlearned Word IDs:', unLearnedWordIds[0]?.tr);
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error fetching user data:', error);
     }
   };
 
-  const removeWord = () => {
-    console.log('Remove Word');
-  }
-
   const goBack = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       setCurrentIndex(currentIndex - 1);
     }
   }
 
   const goNext = () => {
-    if (currentIndex < unLearnedWordIds.length - 1) {
+    if (currentIndex < unLearnedWordIds.length - 1)
+    {
       setCurrentIndex(currentIndex + 1);
     }
   }
@@ -95,18 +103,48 @@ const unLearnedPage = () => {
     console.log('toggleDisplayLanguage');
   }
 
+  const removeWord = () => {
+    console.log('Kelime Çıkarıldı');
+    if (isLearned)
+    {
+      setIsLearned(false);
+    }
+    else
+    {
+      setIsLearned(true);
+    }
+  };
+
+  const favoriteButton = () => {
+    console.log('Favorilere Eklendi');
+    if (isFavorite)
+    {
+      setIsFavorite(false);
+    }
+    else
+    {
+      setIsFavorite(true);
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={removeWord} style={styles.removeButton}>
-        <Text style={styles.buttonText}>Remove</Text>
-      </TouchableOpacity>
+      <Text style={{ marginBottom: 20 }}>
+        <TouchableOpacity onPress={favoriteButton}>
+          <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={removeWord}>
+          <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
+        </TouchableOpacity>
+      </Text>
 
       <FlipCard
         style={styles.cardContainer}
         friction={2.4}
         perspective={1000}
         flipHorizontal={true}
-        flipVertical={false} 
+        flipVertical={false}
         flip={isFlipped}        // ! goBack ve goNext fonksiyonlarında kartı face (default) konumuna getirme sorunu var.
         clickable={true}
         onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}

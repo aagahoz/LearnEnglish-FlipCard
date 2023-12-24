@@ -2,33 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { MaterialIcons } from '@expo/vector-icons';
+
 
 const PlayPage = () => {
   const [words, setWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayEnglish, setDisplayEnglish] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLearned, setIsLearned] = useState(false);
 
   useEffect(() => {
     fetchWords();
   }, []);
 
   const fetchWords = async () => {
-    try {
+    try
+    {
       const firestore = getFirestore();
       const wordsCollection = collection(firestore, 'Words');
       const wordsSnapshot = await getDocs(wordsCollection);
       const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
       setWords(wordsData);
       console.log(wordsData);
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error fetching words:', error);
     }
   };
 
-  const addToLearned = () => {
-    console.log('Kelime Eklendi'); // ! Bu fonksiyonu düzelt
-  };
+
 
   const toggleDisplayLanguage = () => {
     setIsFlipped(true);
@@ -37,31 +41,66 @@ const PlayPage = () => {
   };
 
   const goNext = () => {
-    if (currentIndex < words.length - 1) {
+    if (currentIndex < words.length - 1)
+    {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false);
     }
   };
 
   const goBack = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false);
     }
   };
+  const addToLearned = () => {
+    console.log('Kelime Eklendi');
+    if (isLearned)
+    {
+      setIsLearned(false);
+    }
+    else
+    {
+      setIsLearned(true);
+    }
+  };
+
+  const favoriteButton = () => {
+    console.log('changeFavorite');
+    if (isFavorite)
+    {
+      setIsFavorite(false);
+    }
+    else
+    {
+      setIsFavorite(true);
+    }
+
+    
+
+  }
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={addToLearned} style={styles.learnedButton}>
-        <Text style={styles.buttonText}>add to learned</Text>
-      </TouchableOpacity>
+
+      <Text style={{ marginBottom: 20 }}>
+        <TouchableOpacity onPress={favoriteButton}>
+          <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={addToLearned}>
+          <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
+        </TouchableOpacity>
+      </Text>
 
       <FlipCard
         style={styles.cardContainer}
         friction={2.4}
         perspective={1000}
         flipHorizontal={true}
-        flipVertical={false} 
+        flipVertical={false}
         flip={isFlipped}        // ! goBack ve goNext fonksiyonlarında kartı face (default) konumuna getirme sorunu var.
         clickable={true}
         onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
@@ -98,7 +137,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems:'center',
+    alignItems: 'center',
     padding: 20,
     backgroundColor: 'white',
   },
@@ -127,13 +166,13 @@ const styles = StyleSheet.create({
     width: '35%',
     marginLeft: 30,
     marginRight: 20,
-    
+
   },
   cardContainer: {
     width: 200,
     height: 300,
     justifyContent: 'center',
-    marginBottom: 50, 
+    marginBottom: 50,
   },
   card: {
     flex: 1,
@@ -157,3 +196,8 @@ const styles = StyleSheet.create({
 });
 
 export default PlayPage;
+
+
+// <TouchableOpacity onPress={addToLearned} style={styles.learnedButton}>
+//         <Text style={styles.buttonText}>add to learned</Text>
+// </TouchableOpacity>
