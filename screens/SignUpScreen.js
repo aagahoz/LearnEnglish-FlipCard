@@ -13,8 +13,9 @@ import { auth } from "../firebaseConfig";
 import { doc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { AntDesign } from '@expo/vector-icons';
 
-export default function SignUpPage ({ navigation, setIsSignedIn }) {
+export default function SignUpPage({ navigation, setIsSignedIn }) {
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -40,8 +41,8 @@ export default function SignUpPage ({ navigation, setIsSignedIn }) {
               setEmail("");
               setPassword("");
               setConfirmPassword('');
-              const auth = getAuth(); // Firebase Authentication nesnesini al
-              const user = auth.currentUser; // Oturum açan kullanıcının bilgilerini al
+              const auth = getAuth(); 
+              const user = auth.currentUser;
               addUser(user.uid, email, isAdmin = false, isActive = true);
             })
             .catch((error) => {
@@ -67,18 +68,15 @@ export default function SignUpPage ({ navigation, setIsSignedIn }) {
       const usersCollection = collection(firestore, 'Users');
       const querySnapshot = await getDocs(usersCollection);
 
-      // Kullanıcıların içinde gezin
       for (const doc of querySnapshot.docs)
       {
         const userData = doc.data();
         if (userData.email === email)
         {
-          // Eğer email adresi bulunduysa, true döndür
           return true;
         }
       }
 
-      // Eğer email adresi bulunamadıysa, false döndür
       return false;
     } catch (error)
     {
@@ -94,22 +92,19 @@ export default function SignUpPage ({ navigation, setIsSignedIn }) {
       const firestore = getFirestore();
       const userRef = doc(firestore, 'Users', userId);
 
-      // Yeni kullanıcı verileri
       const newUser = {
         email,
         isAdmin,
         isActive,
       };
 
-      // Belirli bir ID ile "Users" koleksiyonuna kullanıcı ekle
       await setDoc(userRef, newUser);
 
-      // Eğer başarıyla eklendiyse, kullanıcının ID'sini döndür
       return userId;
     } catch (error)
     {
       console.error('Error adding user:', error);
-      return null; // Hata durumunda null döndürebilir veya hata yönetimini kendi ihtiyaçlarınıza göre ayarlayabilirsiniz.
+      return null;
     }
   };
 
@@ -118,14 +113,14 @@ export default function SignUpPage ({ navigation, setIsSignedIn }) {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={60}
       style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.errorMessage}>{errorMessage}</Text>
+      <AntDesign name="adduser" size={44} color="black"/>
       <TextInput
         style={styles.input}
         placeholder="Email"
         placeholderTextColor="#BEBEBE"
         value={email}
         onChangeText={setEmail}
+        marginTop={20}
       />
       <TextInput
         style={styles.input}
@@ -149,7 +144,8 @@ export default function SignUpPage ({ navigation, setIsSignedIn }) {
       <TouchableOpacity style={styles.signUpButton} onPress={signUp}>
         <Text style={styles.signUpButtonText}>Sign Up</Text>
       </TouchableOpacity>
-      <Text>{errorMessage}</Text>
+
+      <Text style={styles.errorMessage}>{errorMessage}</Text>
     </KeyboardAvoidingView>
 
   );
@@ -193,5 +189,10 @@ const styles = StyleSheet.create({
   signUpButtonText: {
     color: '#fff',
     textAlign: 'center',
+  },
+  errorMessage: {
+    color: 'tomato',
+    marginTop: 15,
+    fontSize: 14,
   },
 });

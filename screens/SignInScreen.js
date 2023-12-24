@@ -6,17 +6,19 @@ import {
   Button,
   TouchableOpacity,
   StyleSheet,
+  KeyboardAvoidingView,
 } from 'react-native';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import { getFirestore, collection, getDocs, getDoc, doc } from 'firebase/firestore';
+import { Octicons } from '@expo/vector-icons';
 
-export default function SignInPage ({ navigation, setIsSignedIn, setIsAdmin }) {
+export default function SignInPage({ navigation, setIsSignedIn, setIsAdmin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const login = async () => {
+  const SignIn = async () => {
     if (email !== '' && password !== '')
     {
       try
@@ -29,32 +31,32 @@ export default function SignInPage ({ navigation, setIsSignedIn, setIsAdmin }) {
         }
         else
         {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const userId = userCredential.user.uid;
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const userId = userCredential.user.uid;
 
-        const firestore = getFirestore();
-        const userDocRef = doc(firestore, 'Users', userId);
-        const userDocSnapshot = await getDoc(userDocRef);
+          const firestore = getFirestore();
+          const userDocRef = doc(firestore, 'Users', userId);
+          const userDocSnapshot = await getDoc(userDocRef);
 
-        if (userDocSnapshot.exists())
-        {
-          const userData = userDocSnapshot.data();
-          if (userData && 'isAdmin' in userData)
+          if (userDocSnapshot.exists())
           {
-            console.log('isAdmin:', userData.isAdmin);
-            setIsSignedIn(true);
-            setIsAdmin(userData.isAdmin === true);
+            const userData = userDocSnapshot.data();
+            if (userData && 'isAdmin' in userData)
+            {
+              console.log('isAdmin:', userData.isAdmin);
+              setIsSignedIn(true);
+              setIsAdmin(userData.isAdmin === true);
+            } else
+            {
+              console.log('User document does not have isAdmin field');
+              setIsSignedIn(true);
+              setIsAdmin(false);
+            }
           } else
           {
-            console.log('User document does not have isAdmin field');
-            setIsSignedIn(true);
-            setIsAdmin(false);
+            console.log('User document not found');
           }
-        } else
-        {
-          console.log('User document not found');
         }
-      }
 
       } catch (error)
       {
@@ -93,13 +95,18 @@ export default function SignInPage ({ navigation, setIsSignedIn, setIsAdmin }) {
 
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Log In</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      keyboardVerticalOffset={60}
+      style={styles.container}>
+
+      <Octicons name="sign-in" size={44} color="black" />
       <TextInput
         placeholder="Email"
         value={email}
         onChangeText={(text) => setEmail(text)}
         style={styles.input}
+        marginTop={20}
       />
       <TextInput
         placeholder="Password"
@@ -107,14 +114,18 @@ export default function SignInPage ({ navigation, setIsSignedIn, setIsAdmin }) {
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
+        marginTop={20}
       />
       <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')}>
         <Text style={styles.linkText}>Reset Password</Text>
       </TouchableOpacity>
-      <Button title="Login" onPress={login} />
+
+      <TouchableOpacity style={styles.signInButton} onPress={SignIn}>
+        <Text style={styles.signInButtonText}>Sign In</Text>
+      </TouchableOpacity>
 
       <Text style={styles.errorMessage}>{errorMessage}</Text>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -130,22 +141,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  input: {
-    borderWidth: 2,
-    borderColor: '#ccc',
-    margin: 20,
-    padding: 15,
-    width: '90%',
-    borderRadius: 8,
-    fontSize: 26,
-  },
   errorMessage: {
-    color: 'tomato',
-    marginTop: 15,
-    fontSize: 14,
+    color: 'red',
+    marginBottom: 20,
+  },
+  input: {
+    width: '80%',
+    height: 40,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 20,
+    borderRadius: 5,
   },
   linkText: {
     color: '#007BFF',
     marginBottom: 20,
+  },
+  signInButton: {
+    backgroundColor: '#28A745',
+    padding: 10,
+    borderRadius: 5,
+  },
+  signInButtonText: {
+    color: '#fff',
+    textAlign: 'center',
   },
 });
