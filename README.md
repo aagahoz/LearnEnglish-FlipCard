@@ -68,7 +68,7 @@ npm install
 npx expo start
 ```
 
-### Sign Up
+#### Sign Up
 ```bash
 Sign Up paneli ile üyelik oluşturduktan sonra test edebilirsiniz.
 ```
