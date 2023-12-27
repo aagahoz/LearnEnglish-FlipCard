@@ -26,11 +26,14 @@ const App = () => {
   return (
     <NavigationContainer>
       <Tab.Navigator
+        initialRouteName={isSignedIn ? (isAdmin ? 'Home' : 'Learn') : 'SignInTab'} // Oturum açık mı kontrol et
+
         screenOptions={({ route }) => ({
           tabBarLabelStyle: {
             fontSize: 13,
             fontWeight: 'bold',
           },
+
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 

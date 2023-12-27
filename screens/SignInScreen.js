@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
-  Button,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
@@ -17,20 +17,17 @@ export default function SignInPage({ navigation, setIsSignedIn, setIsAdmin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const SignIn = async () => {
-    if (email !== '' && password !== '')
-    {
-      try
-      {
-        // ! user tablosunda aktif pasif kontrolü
+    if (email !== '' && password !== '') {
+      try {
+        setIsLoading(true);
+        // user tablosunda aktif pasif kontrolü
         const isActive = await checkUserIsActive(email);
-        if (isActive == false)
-        {
+        if (isActive == false) {
           setErrorMessage('Disabled User');
-        }
-        else
-        {
+        } else {
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
           const userId = userCredential.user.uid;
 
@@ -38,68 +35,63 @@ export default function SignInPage({ navigation, setIsSignedIn, setIsAdmin }) {
           const userDocRef = doc(firestore, 'Users', userId);
           const userDocSnapshot = await getDoc(userDocRef);
 
-          if (userDocSnapshot.exists())
-          {
+          if (userDocSnapshot.exists()) {
             const userData = userDocSnapshot.data();
-            if (userData && 'isAdmin' in userData)
-            {
+            if (userData && 'isAdmin' in userData) {
               console.log('isAdmin:', userData.isAdmin);
               setIsSignedIn(true);
               setIsAdmin(userData.isAdmin === true);
-            } else
-            {
+            } else {
               console.log('User document does not have isAdmin field');
               setIsSignedIn(true);
               setIsAdmin(false);
             }
-          } else
-          {
+          } else {
             console.log('User document not found');
           }
         }
-
-      } catch (error)
-      {
+      } catch (error) {
         setErrorMessage(error.message);
+      } finally {
+        setIsLoading(false);
       }
-    } else
-    {
+    } else {
       setErrorMessage('Please enter an email and password');
     }
   };
 
   const checkUserIsActive = async (email) => {
-    try
-    {
+    try {
       const firestore = getFirestore();
       const usersCollection = collection(firestore, 'Users');
       const querySnapshot = await getDocs(usersCollection);
 
       // Kullanıcıların içinde gezin
-      for (const doc of querySnapshot.docs)
-      {
+      for (const doc of querySnapshot.docs) {
         const userData = doc.data();
-        if (userData.email === email)
-        {
+        if (userData.email === email) {
           return userData.isActive;
         }
       }
 
       return false;
-    } catch (error)
-    {
+    } catch (error) {
       console.error('Error checking user isActive:', error);
       return false;
     }
   };
 
+  useEffect(() => {
+    setIsLoading(false); // Reset loading state when component unmounts or navigates away
+    return () => setIsLoading(false);
+  }, []);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={60}
-      style={styles.container}>
-
+      style={styles.container}
+    >
       <Octicons name="sign-in" size={44} color="black" />
       <TextInput
         placeholder="Email"
@@ -120,14 +112,18 @@ export default function SignInPage({ navigation, setIsSignedIn, setIsAdmin }) {
         <Text style={styles.linkText}>Reset Password</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.signInButton} onPress={SignIn}>
-        <Text style={styles.signInButtonText}>Sign In</Text>
+      <TouchableOpacity style={styles.signInButton} onPress={SignIn} disabled={isLoading}>
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.signInButtonText}>Sign In</Text>
+        )}
       </TouchableOpacity>
 
       <Text style={styles.errorMessage}>{errorMessage}</Text>
     </KeyboardAvoidingView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -135,11 +131,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
   errorMessage: {
     color: 'red',
@@ -162,9 +153,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#28A745',
     padding: 10,
     borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
   },
   signInButtonText: {
     color: '#fff',
     textAlign: 'center',
   },
-});
+})

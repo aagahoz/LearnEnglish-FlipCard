@@ -1,37 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { MaterialIcons } from '@expo/vector-icons';
 
-// ! Unlearned Wordleri id ile çekip cardta gösterme eksik
-
-const unLearnedPage = () => {
+const UnLearnedPage = () => {
   const [userData, setUserData] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
-  const [learnedWordsData, setLearnedWordsData] = useState([]);
+  const [unLearnedWordIds, setUnLearnedWordIds] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [displayEnglish, setDisplayEnglish] = useState(true);
-  const [unLearnedWordIds, setUnLearnedWordIds] = useState([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLearned, setIsLearned] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user)
-      {
+      if (user) {
         setUserEmail(user.email);
         fetchUserData(user.email);
-      } else
-      {
+      } else {
         setUserEmail(null);
         setUserData(null);
-        setLearnedWordsData([]);
         setUnLearnedWordIds([]);
       }
     });
@@ -40,59 +34,37 @@ const unLearnedPage = () => {
   }, []);
 
   const fetchUserData = async (email) => {
-    try
-    {
+    try {
       const firestore = getFirestore();
 
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
       const userQuerySnapshot = await getDocs(userQuery);
 
-      if (userQuerySnapshot.size > 0)
-      {
+      if (userQuerySnapshot.size > 0) {
         const userData = userQuerySnapshot.docs[0].data();
         setUserData(userData);
 
         const learnedWordsIds = userData.learnedWords || [];
-        const wordsPromises = learnedWordsIds.map(async (wordId) => {
-          const wordDocRef = doc(firestore, 'Words', wordId);
-          const wordDocSnapshot = await getDoc(wordDocRef);
-
-          if (wordDocSnapshot.exists())
-          {
-            return wordDocSnapshot.data();
-          } else
-          {
-            return null;
-          }
-        });
-
-        const wordsData = await Promise.all(wordsPromises);
-
-        setLearnedWordsData(wordsData.filter((word) => word !== null));
-
         const allWordsQuery = query(collection(firestore, 'Words'));
         const allWordsSnapshot = await getDocs(allWordsQuery);
         const allWordIds = allWordsSnapshot.docs.map((doc) => doc.id);
 
         setUnLearnedWordIds(allWordIds.filter((wordId) => !learnedWordsIds.includes(wordId)));
-        console.log('Unlearned Word IDs:', unLearnedWordIds[0]?.tr);
+        setIsLoading(false); // Veriler yüklendiğinde yüklenme durumunu kapat
       }
-    } catch (error)
-    {
+    } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
 
   const goBack = () => {
-    if (currentIndex > 0)
-    {
+    if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
   }
 
   const goNext = () => {
-    if (currentIndex < unLearnedWordIds.length - 1)
-    {
+    if (currentIndex < unLearnedWordIds.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   }
@@ -105,26 +77,22 @@ const unLearnedPage = () => {
 
   const removeWord = () => {
     console.log('Kelime Çıkarıldı');
-    if (isLearned)
-    {
-      setIsLearned(false);
-    }
-    else
-    {
-      setIsLearned(true);
-    }
+    setIsLearned((prevIsLearned) => !prevIsLearned);
   };
 
   const favoriteButton = () => {
     console.log('Favorilere Eklendi');
-    if (isFavorite)
-    {
-      setIsFavorite(false);
-    }
-    else
-    {
-      setIsFavorite(true);
-    }
+    setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+  }
+
+  if (isLoading) {
+    // Yükleniyor durumundayken gösterilecek ekran
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
   return (
@@ -145,7 +113,7 @@ const unLearnedPage = () => {
         perspective={1000}
         flipHorizontal={true}
         flipVertical={false}
-        flip={isFlipped}        // ! goBack ve goNext fonksiyonlarında kartı face (default) konumuna getirme sorunu var.
+        flip={isFlipped}
         clickable={true}
         onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
       >
@@ -186,13 +154,10 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white',
   },
-  removeButton: {
-    padding: 10,
-    borderRadius: 5,
-    alignSelf: 'flex-end',
-    backgroundColor: 'red',
-    marginBottom: 70,
-    marginTop: 20,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
@@ -239,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default unLearnedPage;
+export default UnLearnedPage;

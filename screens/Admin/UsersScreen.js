@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -13,8 +14,10 @@ const UsersPage = () => {
         const usersSnapshot = await getDocs(usersCollection);
         const usersData = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setUsers(usersData);
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching users:', error);
+        setIsLoading(false);
       }
     };
 
@@ -43,29 +46,25 @@ const UsersPage = () => {
     }
   };
 
-  const  activateUser = async (userId) => {
+  const activateUser = async (userId) => {
     try {
       const firestore = getFirestore();
       const userRef = doc(firestore, 'Users', userId);
-    //   await deleteDoc(userRef);
       await updateDoc(userRef, { isActive: true });
       updateLocalUser(userId, { isActive: true });
-
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.error('Error activating user:', error);
     }
   };
 
-  const  disableUser = async (userId) => {
+  const disableUser = async (userId) => {
     try {
       const firestore = getFirestore();
       const userRef = doc(firestore, 'Users', userId);
-    //   await deleteDoc(userRef);
       await updateDoc(userRef, { isActive: false });
       updateLocalUser(userId, { isActive: false });
-
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.error('Error disabling user:', error);
     }
   };
 
@@ -74,7 +73,6 @@ const UsersPage = () => {
       prevUsers.map((user) => (user.id === userId ? { ...user, ...newData } : user))
     );
   };
- 
 
   const renderItem = ({ item }) => (
     <View style={styles.userItem}>
@@ -99,6 +97,15 @@ const UsersPage = () => {
     </View>
   );
 
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Users List</Text>
@@ -118,6 +125,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 20,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
@@ -142,16 +154,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   greenButton: {
-    backgroundColor: '#00CC33', 
+    backgroundColor: '#00CC33',
   },
   redButton: {
-    backgroundColor: '#CC6633', 
+    backgroundColor: '#CC6633',
   },
   blueButton: {
-    backgroundColor: '#ADD8E6', 
+    backgroundColor: '#ADD8E6',
   },
   yellowButton: {
-    backgroundColor: '#CCCC00', 
+    backgroundColor: '#CCCC00',
   },
 });
 

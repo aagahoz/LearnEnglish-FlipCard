@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -14,6 +14,7 @@ const LearnedPage = () => {
   const [displayEnglish, setDisplayEnglish] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLearned, setIsLearned] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Yüklenme durumu
 
   useEffect(() => {
     const auth = getAuth();
@@ -28,6 +29,7 @@ const LearnedPage = () => {
         setUserEmail(null);
         setUserData(null);
         setLearnedWordsData([]);
+        setIsLoading(false); // Veriler yüklendiğinde yüklenme durumunu kapat
       }
     });
 
@@ -65,28 +67,39 @@ const LearnedPage = () => {
 
         setLearnedWordsData(wordsData.filter((word) => word !== null));
       }
+
+      setIsLoading(false); // Veriler yüklendiğinde yüklenme durumunu kapat
     } catch (error)
     {
       console.error('Error fetching user data:', error);
     }
   };
 
-
+  if (isLoading) {
+    // Yükleniyor durumundayken gösterilecek ekran
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   const toggleDisplayLanguage = () => {
     setIsFlipped(true);
     setDisplayEnglish((prevDisplay) => !prevDisplay);
     console.log('toggleDisplayLanguage');
   };
-
+  
   const goNext = () => {
     if (currentIndex < learnedWordsData.length - 1)
     {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false); // Kartı kapalı (default) konumuna getir
+  
     }
   };
-
+  
   const goBack = () => {
     if (currentIndex > 0)
     {
@@ -94,7 +107,7 @@ const LearnedPage = () => {
       setIsFlipped(false); // Kartı kapalı (default) konumuna getir
     }
   };
-
+  
   const removeWord = () => {
     console.log('Kelime Çıkarıldı');
     if (isLearned)
@@ -106,9 +119,10 @@ const LearnedPage = () => {
       setIsLearned(true);
     }
   };
-
+  
   const favoriteButton = () => {
     console.log('Favorilere Eklendi');
+  
     if (isFavorite)
     {
       setIsFavorite(false);
@@ -119,56 +133,70 @@ const LearnedPage = () => {
     }
   }
 
-
   return (
     <View style={styles.container}>
-      <Text style={{ marginBottom: 20 }}>
-        <TouchableOpacity onPress={favoriteButton}>
-          <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
-        </TouchableOpacity>
+      {learnedWordsData.length !== 0 ? (
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ marginLeft: 250 }}>
+            <TouchableOpacity onPress={favoriteButton}>
+              <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={removeWord}>
+              <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
+            </TouchableOpacity>
+          </Text>
+        </View>
+      ) : (
+        <View></View>
+      )}
 
-        <TouchableOpacity onPress={removeWord}>
-          <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
-        </TouchableOpacity>
-      </Text>
+      {learnedWordsData.length !== 0 ? (
+        <FlipCard
+          style={styles.cardContainer}
+          friction={2.4}
+          perspective={1000}
+          flipHorizontal={true}
+          flipVertical={false}
+          flip={isFlipped}
+          clickable={true}
+          onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
+        >
+          {/* Front Side */}
+          <View style={[styles.card, styles.cardFront]}>
+            <TouchableOpacity onPress={toggleDisplayLanguage}>
+              <Text style={styles.cardText}>{displayEnglish ? learnedWordsData[currentIndex]?.eng : learnedWordsData[currentIndex]?.tr}</Text>
+            </TouchableOpacity>
+          </View>
 
-      <FlipCard
-        style={styles.cardContainer}
-        friction={2.4}
-        perspective={1000}
-        flipHorizontal={true}
-        flipVertical={false}
-        flip={isFlipped}        // ! goBack ve goNext fonksiyonlarında kartı face (default) konumuna getirme sorunu var.
-        clickable={true}
-        onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
-      >
-        {/* Front Side */}
-        <View style={[styles.card, styles.cardFront]}>
-          <TouchableOpacity onPress={toggleDisplayLanguage}>
-            <Text style={styles.cardText}>{displayEnglish ? learnedWordsData[currentIndex]?.eng : learnedWordsData[currentIndex]?.tr}</Text>
+          {/* Back Side */}
+          <View style={[styles.card, styles.cardBack]}>
+            <TouchableOpacity onPress={toggleDisplayLanguage}>
+              <Text style={styles.cardText}>{displayEnglish ? learnedWordsData[currentIndex]?.tr : learnedWordsData[currentIndex]?.eng}</Text>
+            </TouchableOpacity>
+          </View>
+        </FlipCard>
+      ) : (
+        <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 20 }}>You have not learned any words yet.</Text>
+      )}
+
+      {learnedWordsData.length !== 0 ? (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={goBack} style={styles.button}>
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={goNext} style={styles.button}>
+            <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Back Side */}
-        <View style={[styles.card, styles.cardBack]}>
-          <TouchableOpacity onPress={toggleDisplayLanguage}>
-            <Text style={styles.cardText}>{displayEnglish ? learnedWordsData[currentIndex]?.tr : learnedWordsData[currentIndex]?.eng}</Text>
-          </TouchableOpacity>
-        </View>
-      </FlipCard>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={goBack} style={styles.button}>
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={goNext} style={styles.button}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
+      ) : (
+        <View></View>
+      )}
     </View>
   );
 };
+  
+
 
 const styles = StyleSheet.create({
   container: {
@@ -177,6 +205,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor: 'white',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   removeButton: {
     padding: 10,
@@ -233,3 +266,5 @@ const styles = StyleSheet.create({
 });
 
 export default LearnedPage;
+
+

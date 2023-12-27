@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { MaterialIcons } from '@expo/vector-icons';
+import { updateDoc } from "firebase/firestore";
 
 const FavoritePage = () => {
   const [userData, setUserData] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
-  const [favoritesWordsData, setfavoritesWordsData] = useState([]);
+  const [favoritesWordsData, setFavoritesWordsData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [displayEnglish, setDisplayEnglish] = useState(true);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isLearned, setIsLearned] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user)
-      {
+      if (user) {
         setUserEmail(user.email);
         fetchUserData(user.email);
-      } else
-      {
+      } else {
         setUserEmail(null);
         setUserData(null);
-        setfavoritesWordsData([]);
+        setFavoritesWordsData([]);
+        setIsLoading(false);
       }
     });
 
@@ -35,100 +35,146 @@ const FavoritePage = () => {
   }, []);
 
   const fetchUserData = async (email) => {
-    try
-    {
+    try {
       const firestore = getFirestore();
 
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
       const userQuerySnapshot = await getDocs(userQuery);
 
-      if (userQuerySnapshot.size > 0)
-      {
+      if (userQuerySnapshot.size > 0) {
         const userData = userQuerySnapshot.docs[0].data();
         setUserData(userData);
 
         const favoritesWordsIds = userData.favoritesWords || [];
+        if (favoritesWordsIds.length === 0) {
+          setFavoritesWordsData([]);
+          setIsLoading(false);
+          return;
+        }
         const wordsPromises = favoritesWordsIds.map(async (wordId) => {
           const wordDocRef = doc(firestore, 'Words', wordId);
           const wordDocSnapshot = await getDoc(wordDocRef);
 
-          if (wordDocSnapshot.exists())
-          {
+          if (wordDocSnapshot.exists()) {
             return wordDocSnapshot.data();
-          } else
-          {
+          } else {
             return null;
           }
         });
 
         const wordsData = await Promise.all(wordsPromises);
 
-        setfavoritesWordsData(wordsData.filter((word) => word !== null));
+        setFavoritesWordsData(wordsData.filter((word) => word !== null));
+        setIsLoading(false);
       }
-    } catch (error)
-    {
+    } catch (error) {
       console.error('Error fetching user data:', error);
+      setIsLoading(false);
     }
   };
-
-
 
   const toggleDisplayLanguage = () => {
     setIsFlipped(true);
     setDisplayEnglish((prevDisplay) => !prevDisplay);
-    console.log('toggleDisplayLanguage');
   };
 
   const goNext = () => {
-    if (currentIndex < favoritesWordsData.length - 1)
-    {
+    if (currentIndex < favoritesWordsData.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false);
     }
   };
 
   const goBack = () => {
-    if (currentIndex > 0)
-    {
+    if (currentIndex > 0) {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false);
     }
   };
 
-  const removeWord = () => {
-    console.log('Kelime Çıkarıldı');
-    if (isLearned)
-    {
-      setIsLearned(false);
+  const toggleFavoriteButton = async () => {
+    const currentWordID = getCurrentWordID();
+
+    if (isFavorite) {
+      removeFromFavorite(currentWordID);
+    } else {
+      addToFavorite(currentWordID);
     }
-    else
-    {
-      setIsLearned(true);
-    }
+
+    setIsFavorite((prevIsFavorite) => !prevIsFavorite);
   };
 
-  const favoriteButton = () => {
-    console.log('Favorilere Eklendi');
-    if (isFavorite)
-    {
-      setIsFavorite(false);
-    }
-    else
-    {
-      setIsFavorite(true);
-    }
-  }
+  const getCurrentWordID = () => {
+    const currentWordID = favoritesWordsData[currentIndex]?.id;
+    return currentWordID;
+  };
 
+  const removeFromFavorite = async (currentWordID) => {
+    const firestore = getFirestore();
+    const uid = getUserId();
+    const userDocRef = doc(firestore, 'Users', uid);
+    const newFavoriteWordsIDs = removeWordFromFavoriteWordsIDsArray(currentWordID);
+    await updateDoc(userDocRef, {
+      favoritesWords: newFavoriteWordsIDs,
+    });
+
+    setFavoritesWordsData(favoritesWordsData.filter((word) => word.id !== currentWordID));
+  };
+
+  const addToFavorite = async (currentWordID) => {
+    const firestore = getFirestore();
+    const uid = getUserId();
+    const userDocRef = doc(firestore, 'Users', uid);
+    const newFavoriteWordsIDs = addWordToFavoriteWordsIDsArray(currentWordID);
+
+    await updateDoc(userDocRef, {
+      favoritesWords: newFavoriteWordsIDs,
+    });
+  };
+
+  const getUserId = () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const uid = user.uid;
+    return uid;
+  };
+
+  const getFavoriteWordsIDs = () => {
+    const favoriteWordsIDs = userData?.favoritesWords;
+    return favoriteWordsIDs;
+  };
+
+  const removeWordFromFavoriteWordsIDsArray = (currentWordID) => {
+    const favoriteWordsIDs = getFavoriteWordsIDs();
+    const newFavoriteWordsIDs = favoriteWordsIDs.filter((wordID) => wordID !== currentWordID);
+    return newFavoriteWordsIDs;
+  };
+
+  const addWordToFavoriteWordsIDsArray = (currentWordID) => {
+    const favoriteWordsIDs = getFavoriteWordsIDs();
+
+    if (favoriteWordsIDs.includes(currentWordID)) {
+      return favoriteWordsIDs;
+    }
+
+    const newFavoriteWordsIDs = [...favoriteWordsIDs, currentWordID];
+    return newFavoriteWordsIDs;
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Text style={{ marginBottom: 20 }}>
-        <TouchableOpacity onPress={favoriteButton}>
-          <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={removeWord}>
-          <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
+        <TouchableOpacity onPress={toggleFavoriteButton}>
+          <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
         </TouchableOpacity>
       </Text>
 
@@ -138,21 +184,27 @@ const FavoritePage = () => {
         perspective={1000}
         flipHorizontal={true}
         flipVertical={false}
-        flip={isFlipped}        // ! goBack ve goNext fonksiyonlarında kartı face (default) konumuna getirme sorunu var.
+        flip={isFlipped}
         clickable={true}
-        onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
+        onFlipEnd={(isFlipEnd) => {
+          console.log('isFlipEnd', isFlipEnd);
+        }}
       >
         {/* Front Side */}
         <View style={[styles.card, styles.cardFront]}>
           <TouchableOpacity onPress={toggleDisplayLanguage}>
-            <Text style={styles.cardText}>{displayEnglish ? favoritesWordsData[currentIndex]?.eng : favoritesWordsData[currentIndex]?.tr}</Text>
+            <Text style={styles.cardText}>
+              {displayEnglish ? favoritesWordsData[currentIndex]?.eng : favoritesWordsData[currentIndex]?.tr}
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Back Side */}
         <View style={[styles.card, styles.cardBack]}>
           <TouchableOpacity onPress={toggleDisplayLanguage}>
-            <Text style={styles.cardText}>{displayEnglish ? favoritesWordsData[currentIndex]?.tr : favoritesWordsData[currentIndex]?.eng}</Text>
+            <Text style={styles.cardText}>
+              {displayEnglish ? favoritesWordsData[currentIndex]?.tr : favoritesWordsData[currentIndex]?.eng}
+            </Text>
           </TouchableOpacity>
         </View>
       </FlipCard>
@@ -178,13 +230,10 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white',
   },
-  removeButton: {
-    padding: 10,
-    borderRadius: 5,
-    alignSelf: 'flex-end',
-    backgroundColor: 'red',
-    marginBottom: 70,
-    marginTop: 20,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
@@ -203,7 +252,6 @@ const styles = StyleSheet.create({
     width: '35%',
     marginLeft: 30,
     marginRight: 20,
-
   },
   cardContainer: {
     width: 200,
@@ -228,7 +276,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black', // veya '#000'
+    color: 'black',
   },
 });
 

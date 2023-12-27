@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { getFirestore, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 const WordsPage = () => {
   const [words, setWords] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchWords();
@@ -16,8 +17,10 @@ const WordsPage = () => {
       const wordsSnapshot = await getDocs(WordsCollection);
       const wordsData = wordsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setWords(wordsData);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching words:', error);
+      setIsLoading(false);
     }
   };
 
@@ -50,9 +53,9 @@ const WordsPage = () => {
   };
 
   const handleRefresh = () => {
+    setIsLoading(true);
     fetchWords();
   };
-
 
   const renderItem = ({ item }) => (
     <View style={styles.wordItem}>
@@ -72,6 +75,15 @@ const WordsPage = () => {
     </View>
   );
 
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -90,16 +102,19 @@ const WordsPage = () => {
       />
     </View>
   );
-  
 };
 
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
     alignItems: 'center',
     paddingTop: 20,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
@@ -113,8 +128,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    flexDirection: 'column', 
-    alignItems: 'center', 
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   wordText: {
     fontSize: 16,
@@ -126,7 +141,7 @@ const styles = StyleSheet.create({
   wordEngTrContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%', 
+    width: '100%',
     marginBottom: 5,
   },
   wordEng: {
@@ -134,17 +149,17 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   wordTr: {
-    color: '#00CC33', 
-    flex: 1, 
+    color: '#00CC33',
+    flex: 1,
   },
   wordIsActive: {
     color: '#CC0099',
-    flex: 1, 
+    flex: 1,
   },
   actionsContainer: {
     flexDirection: 'row',
     marginTop: 10,
-    justifyContent: 'flex-end', 
+    justifyContent: 'flex-end',
   },
   actionButton: {
     marginRight: 10,
@@ -153,10 +168,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   greenButton: {
-    backgroundColor: '#00CC33', 
+    backgroundColor: '#00CC33',
   },
   redButton: {
-    backgroundColor: '#CC6633', 
+    backgroundColor: '#CC6633',
   },
   header: {
     flexDirection: 'row',
@@ -167,7 +182,7 @@ const styles = StyleSheet.create({
   refreshButton: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#33CCCC', 
+    backgroundColor: '#33CCCC',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#2E7D32',

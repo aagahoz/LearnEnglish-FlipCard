@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from 'react-native';
 import { signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
+import { Octicons } from '@expo/vector-icons';
 
 export default function SettingsPage ({ setIsSignedIn }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -9,6 +10,7 @@ export default function SettingsPage ({ setIsSignedIn }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   const handleLogout = async () => {
     try {
@@ -23,6 +25,7 @@ export default function SettingsPage ({ setIsSignedIn }) {
     try {
       setError(''); 
       setSuccessMessage(''); 
+      setIsLoading(true); // Set loading to true
 
       const user = auth.currentUser;
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
@@ -46,12 +49,15 @@ export default function SettingsPage ({ setIsSignedIn }) {
     } catch (error) {
       console.error('Password Change Error:', error.message);
       setError('Password change failed. Please try again.');
+    } finally {
+      setIsLoading(false); // Set loading to false, regardless of success or failure
     }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Octicons name="sign-in" size={35} color="black" justifyContent="center" />
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
 
@@ -78,8 +84,8 @@ export default function SettingsPage ({ setIsSignedIn }) {
           value={confirmPassword}
           onChangeText={(text) => setConfirmPassword(text)}
         />
-        <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
-          <Text style={styles.buttonText}>Change Password</Text>
+        <TouchableOpacity style={styles.button} onPress={handleChangePassword} disabled={isLoading}>
+          {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Change Password</Text>}
         </TouchableOpacity>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         {successMessage ? <Text style={styles.successText}>{successMessage}</Text> : null}
@@ -99,6 +105,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     textAlign: 'center',
+    justifyContent: 'center',
+    fontSize: 15,
+    color: 'black',
   },
   logoutButton: {
     backgroundColor: 'red',
@@ -107,6 +116,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 30,
     right: 30,
+    justifyContent: 'center',
+    
   },
   changePasswordContainer: {
     width: '100%',
