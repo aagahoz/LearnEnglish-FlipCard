@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,9 @@ export default function SignInPage({ navigation, setIsSignedIn, setIsAdmin }) {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
 
   const SignIn = async () => {
     if (email !== '' && password !== '') {
@@ -82,7 +85,7 @@ export default function SignInPage({ navigation, setIsSignedIn, setIsAdmin }) {
   };
 
   useEffect(() => {
-    setIsLoading(false); // Reset loading state when component unmounts or navigates away
+    setIsLoading(false);
     return () => setIsLoading(false);
   }, []);
 
@@ -93,26 +96,39 @@ export default function SignInPage({ navigation, setIsSignedIn, setIsAdmin }) {
       style={styles.container}
     >
       <Octicons name="sign-in" size={44} color="black" />
+
       <TextInput
+        ref={emailInputRef}
         placeholder="Email"
         value={email}
         onChangeText={(text) => setEmail(text)}
         style={styles.input}
         marginTop={20}
+        onFocus={() => emailInputRef.current.setNativeProps({ style: { borderColor: '#007BFF' } })}
+        onBlur={() => emailInputRef.current.setNativeProps({ style: { borderColor: '#ccc' } })}
       />
+
       <TextInput
+        ref={passwordInputRef}
         placeholder="Password"
         value={password}
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
         marginTop={20}
+        onFocus={() => passwordInputRef.current.setNativeProps({ style: { borderColor: '#007BFF' } })}
+        onBlur={() => passwordInputRef.current.setNativeProps({ style: { borderColor: '#ccc' } })}
       />
+
       <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')}>
         <Text style={styles.linkText}>Reset Password</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.signInButton} onPress={SignIn} disabled={isLoading}>
+      <TouchableOpacity
+        style={styles.signInButton}
+        onPress={SignIn}
+        disabled={isLoading}
+      >
         {isLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
@@ -141,7 +157,6 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
     marginBottom: 10,
     borderRadius: 5,
   },

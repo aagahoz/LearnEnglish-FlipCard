@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 20,
-    backgroundColor: '#3498db',
+    backgroundColor: '#A0CD60',
     borderRadius: 8,
     width: '45%',
   },
@@ -174,15 +174,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   cardFront: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#1C646D',
   },
   cardBack: {
-    backgroundColor: '#2ecc71',
+    backgroundColor: '#38184C',
   },
   cardText: {
-    fontSize: 18,
+    fontSize: 38,
     fontWeight: 'bold',
-    color: '#34495e',
+    color: '#CEF09D',
   },
 });
 

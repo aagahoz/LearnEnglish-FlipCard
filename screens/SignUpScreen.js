@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,10 @@ export default function SignUpPage({ navigation, setIsSignedIn }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
+  const confirmPasswordInputRef = useRef(null);
 
   const signUp = async () => {
     try {
@@ -106,33 +110,46 @@ export default function SignUpPage({ navigation, setIsSignedIn }) {
     >
       <AntDesign name="adduser" size={44} color="black" />
       <TextInput
+        ref={emailInputRef}
         style={styles.input}
         placeholder="Email"
         placeholderTextColor="#BEBEBE"
         value={email}
         onChangeText={setEmail}
         marginTop={20}
+        onFocus={() => emailInputRef.current.setNativeProps({ style: { borderColor: '#007BFF' } })}
+        onBlur={() => emailInputRef.current.setNativeProps({ style: { borderColor: '#ccc' } })}
       />
       <TextInput
+        ref={passwordInputRef}
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#BEBEBE"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        onFocus={() => passwordInputRef.current.setNativeProps({ style: { borderColor: '#007BFF' } })}
+        onBlur={() => passwordInputRef.current.setNativeProps({ style: { borderColor: '#ccc' } })}
       />
       <TextInput
+        ref={confirmPasswordInputRef}
         style={styles.input}
         placeholder="Confirm Password"
         placeholderTextColor="#BEBEBE"
         secureTextEntry
         value={confirmPassword}
         onChangeText={setConfirmPassword}
+        onFocus={() => confirmPasswordInputRef.current.setNativeProps({ style: { borderColor: '#007BFF' } })}
+        onBlur={() => confirmPasswordInputRef.current.setNativeProps({ style: { borderColor: '#ccc' } })}
       />
       <TouchableOpacity onPress={() => navigation.navigate('Sign In')}>
         <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.signUpButton} onPress={signUp} disabled={loading}>
+      <TouchableOpacity
+        style={styles.signUpButton}
+        onPress={signUp}
+        disabled={loading}
+      >
         {loading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
@@ -157,7 +174,6 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
     marginBottom: 20,
     borderRadius: 5,
   },

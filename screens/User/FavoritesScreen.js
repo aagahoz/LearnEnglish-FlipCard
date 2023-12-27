@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#ecf0f1',
   },
   loadingContainer: {
     flex: 1,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 20,
-    backgroundColor: '#3498db',
+    backgroundColor: '#A0CD60',
     borderRadius: 8,
     width: '45%',
   },
@@ -297,15 +297,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   cardFront: {
-    backgroundColor: 'lightblue',
+    backgroundColor: '#1C646D',
   },
   cardBack: {
-    backgroundColor: 'lightgreen',
+    backgroundColor: '#38184C',
   },
   cardText: {
-    fontSize: 18,
+    fontSize: 38,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#CEF09D',
   },
 });
 

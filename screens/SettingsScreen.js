@@ -1,16 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from 'react-native';
 import { signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
 import { Octicons } from '@expo/vector-icons';
 
-export default function SettingsPage ({ setIsSignedIn }) {
+export default function SettingsPage({ setIsSignedIn }) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const currentPasswordRef = useRef(null);
+  const newPasswordRef = useRef(null);
+  const confirmPasswordRef = useRef(null);
+
+  const onFocusInput = (inputRef) => {
+    inputRef.current?.setNativeProps({
+      style: { borderColor: '#007BFF' },
+    });
+  };
+
+  const onBlurInput = (inputRef) => {
+    inputRef.current?.setNativeProps({
+      style: { borderColor: '#ddd' },
+    });
+  };
 
   const handleLogout = async () => {
     try {
@@ -58,31 +74,40 @@ export default function SettingsPage ({ setIsSignedIn }) {
     <View style={styles.container}>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Octicons name="sign-in" size={35} color="black" justifyContent="center" />
-        <Text style={styles.buttonText}>Logout</Text>
+        <Text style={styles.buttonText}></Text>
       </TouchableOpacity>
 
       <View style={styles.changePasswordContainer}>
         <Text style={styles.subtitle}>Change Password:</Text>
         <TextInput
-          style={styles.input}
+          ref={currentPasswordRef}
+          style={[styles.input, { borderColor: currentPasswordRef.current?.isFocused() ? '#007BFF' : '#ddd' }]}
           placeholder="Current Password"
           secureTextEntry
           value={currentPassword}
           onChangeText={(text) => setCurrentPassword(text)}
+          onFocus={() => onFocusInput(currentPasswordRef)}
+          onBlur={() => onBlurInput(currentPasswordRef)}
         />
         <TextInput
-          style={styles.input}
+          ref={newPasswordRef}
+          style={[styles.input, { borderColor: newPasswordRef.current?.isFocused() ? '#007BFF' : '#ddd' }]}
           placeholder="New Password"
           secureTextEntry
           value={newPassword}
           onChangeText={(text) => setNewPassword(text)}
+          onFocus={() => onFocusInput(newPasswordRef)}
+          onBlur={() => onBlurInput(newPasswordRef)}
         />
         <TextInput
-          style={styles.input}
+          ref={confirmPasswordRef}
+          style={[styles.input, { borderColor: confirmPasswordRef.current?.isFocused() ? '#007BFF' : '#ddd' }]}
           placeholder="Confirm New Password"
           secureTextEntry
           value={confirmPassword}
           onChangeText={(text) => setConfirmPassword(text)}
+          onFocus={() => onFocusInput(confirmPasswordRef)}
+          onBlur={() => onBlurInput(confirmPasswordRef)}
         />
         <TouchableOpacity style={styles.button} onPress={handleChangePassword} disabled={isLoading}>
           {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Change Password</Text>}
@@ -110,7 +135,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: '#e74c3c',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 20,
     position: 'absolute',
     top: 30,
     right: 30,
@@ -154,4 +179,3 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
-
