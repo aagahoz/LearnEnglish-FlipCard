@@ -151,9 +151,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#3498db', // Updated color to a blue shade
-    textAlign: 'center', // Center align the text
-    textTransform: 'uppercase', // Uppercase the text
+    color: '#3498db', 
+    textAlign: 'center', 
+    textTransform: 'uppercase', 
   },
   userList: {
     width: '100%',
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   actionButton: {
-    marginVertical: 4, // Added vertical margin
+    marginVertical: 4, 
     marginRight: 8,
     padding: 8,
     borderRadius: 8,
@@ -209,16 +209,16 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   activeText: {
-    color: '#2ecc71', // Green color for active
+    color: '#2ecc71', 
   },
   inactiveText: {
-    color: '#e74c3c', // Red color for inactive
+    color: '#e74c3c', 
   },
   adminText: {
-    color: '#3498db', // Blue color for admin
+    color: '#3498db', 
   },
   userText: {
-    color: '#f39c12', // Orange color for user
+    color: '#f39c12', 
   },
 
 });

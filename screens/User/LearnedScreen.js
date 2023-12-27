@@ -14,22 +14,20 @@ const LearnedPage = () => {
   const [displayEnglish, setDisplayEnglish] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLearned, setIsLearned] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Yüklenme durumu
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const auth = getAuth();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user)
-      {
+      if (user) {
         setUserEmail(user.email);
         fetchUserData(user.email);
-      } else
-      {
+      } else {
         setUserEmail(null);
         setUserData(null);
         setLearnedWordsData([]);
-        setIsLoading(false); // Veriler yüklendiğinde yüklenme durumunu kapat
+        setIsLoading(false);
       }
     });
 
@@ -37,15 +35,13 @@ const LearnedPage = () => {
   }, []);
 
   const fetchUserData = async (email) => {
-    try
-    {
+    try {
       const firestore = getFirestore();
 
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
       const userQuerySnapshot = await getDocs(userQuery);
 
-      if (userQuerySnapshot.size > 0)
-      {
+      if (userQuerySnapshot.size > 0) {
         const userData = userQuerySnapshot.docs[0].data();
         setUserData(userData);
 
@@ -54,11 +50,9 @@ const LearnedPage = () => {
           const wordDocRef = doc(firestore, 'Words', wordId);
           const wordDocSnapshot = await getDoc(wordDocRef);
 
-          if (wordDocSnapshot.exists())
-          {
+          if (wordDocSnapshot.exists()) {
             return wordDocSnapshot.data();
-          } else
-          {
+          } else {
             return null;
           }
         });
@@ -68,15 +62,13 @@ const LearnedPage = () => {
         setLearnedWordsData(wordsData.filter((word) => word !== null));
       }
 
-      setIsLoading(false); // Veriler yüklendiğinde yüklenme durumunu kapat
-    } catch (error)
-    {
+      setIsLoading(false);
+    } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
 
   if (isLoading) {
-    // Yükleniyor durumundayken gösterilecek ekran
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="blue" />
@@ -90,64 +82,44 @@ const LearnedPage = () => {
     setDisplayEnglish((prevDisplay) => !prevDisplay);
     console.log('toggleDisplayLanguage');
   };
-  
+
   const goNext = () => {
-    if (currentIndex < learnedWordsData.length - 1)
-    {
+    if (currentIndex < learnedWordsData.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
-      setIsFlipped(false); // Kartı kapalı (default) konumuna getir
-  
+      setIsFlipped(false);
     }
   };
-  
+
   const goBack = () => {
-    if (currentIndex > 0)
-    {
+    if (currentIndex > 0) {
       setCurrentIndex((prevIndex) => prevIndex - 1);
-      setIsFlipped(false); // Kartı kapalı (default) konumuna getir
+      setIsFlipped(false);
     }
   };
-  
+
   const removeWord = () => {
     console.log('Kelime Çıkarıldı');
-    if (isLearned)
-    {
-      setIsLearned(false);
-    }
-    else
-    {
-      setIsLearned(true);
-    }
+    setIsLearned((prevIsLearned) => !prevIsLearned);
   };
-  
+
   const favoriteButton = () => {
     console.log('Favorilere Eklendi');
-  
-    if (isFavorite)
-    {
-      setIsFavorite(false);
-    }
-    else
-    {
-      setIsFavorite(true);
-    }
-  }
+    setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+  };
 
   return (
     <View style={styles.container}>
       {learnedWordsData.length !== 0 ? (
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ marginLeft: 250 }}>
-            <TouchableOpacity onPress={favoriteButton}>
-              <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={removeWord}>
-              <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
-            </TouchableOpacity>
-          </Text>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={favoriteButton} style={styles.iconContainer}>
+            <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={removeWord} style={styles.iconContainer}>
+            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'black'} />
+          </TouchableOpacity>
         </View>
       ) : (
-        <View></View>
+        <Text style={styles.noWordsText}>You have not learned any words yet.</Text>
       )}
 
       {learnedWordsData.length !== 0 ? (
@@ -159,25 +131,29 @@ const LearnedPage = () => {
           flipVertical={false}
           flip={isFlipped}
           clickable={true}
-          onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
+          onFlipEnd={(isFlipEnd) => {
+            console.log('isFlipEnd', isFlipEnd);
+          }}
         >
           {/* Front Side */}
           <View style={[styles.card, styles.cardFront]}>
             <TouchableOpacity onPress={toggleDisplayLanguage}>
-              <Text style={styles.cardText}>{displayEnglish ? learnedWordsData[currentIndex]?.eng : learnedWordsData[currentIndex]?.tr}</Text>
+              <Text style={styles.cardText}>
+                {displayEnglish ? learnedWordsData[currentIndex]?.eng : learnedWordsData[currentIndex]?.tr}
+              </Text>
             </TouchableOpacity>
           </View>
 
           {/* Back Side */}
           <View style={[styles.card, styles.cardBack]}>
             <TouchableOpacity onPress={toggleDisplayLanguage}>
-              <Text style={styles.cardText}>{displayEnglish ? learnedWordsData[currentIndex]?.tr : learnedWordsData[currentIndex]?.eng}</Text>
+              <Text style={styles.cardText}>
+                {displayEnglish ? learnedWordsData[currentIndex]?.tr : learnedWordsData[currentIndex]?.eng}
+              </Text>
             </TouchableOpacity>
           </View>
         </FlipCard>
-      ) : (
-        <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 20 }}>You have not learned any words yet.</Text>
-      )}
+      ) : null}
 
       {learnedWordsData.length !== 0 ? (
         <View style={styles.buttonContainer}>
@@ -189,14 +165,10 @@ const LearnedPage = () => {
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
-      ) : (
-        <View></View>
-      )}
+      ) : null}
     </View>
   );
 };
-  
-
 
 const styles = StyleSheet.create({
   container: {
@@ -211,13 +183,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  removeButton: {
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    width: '100%',
+  },
+  iconContainer: {
     padding: 10,
     borderRadius: 5,
-    alignSelf: 'flex-end',
-    backgroundColor: 'red',
-    marginBottom: 70,
-    marginTop: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  noWordsText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   buttonText: {
     color: 'white',
@@ -228,19 +208,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   button: {
     padding: 20,
-    backgroundColor: '#999999',
-    borderRadius: 5,
-    width: '35%',
-    marginLeft: 30,
-    marginRight: 20,
-
+    backgroundColor: '#3498db',
+    borderRadius: 8,
+    width: '45%',
   },
   cardContainer: {
-    width: 200,
-    height: 300,
+    width: 300,
+    height: 400,
     justifyContent: 'center',
     marginBottom: 50,
   },
@@ -266,5 +244,3 @@ const styles = StyleSheet.create({
 });
 
 export default LearnedPage;
-
-

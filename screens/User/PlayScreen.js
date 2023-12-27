@@ -24,17 +24,16 @@ const PlayPage = () => {
       const wordsSnapshot = await getDocs(wordsCollection);
       const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
       setWords(wordsData);
-      setIsLoading(false); // Veriler yüklendiğinde yüklenme durumunu kapat
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching words:', error);
     }
   };
 
   if (isLoading) {
-    // Yükleniyor durumundayken gösterilecek ekran
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator size="large" color="#3498db" />
         <Text>Loading...</Text>
       </View>
     );
@@ -71,15 +70,15 @@ const PlayPage = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={{ marginBottom: 20 }}>
-        <TouchableOpacity onPress={favoriteButton}>
-          <MaterialIcons name={isFavorite ? "favorite" : "favorite-border"} size={34} color="red" />
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={favoriteButton} style={styles.iconContainer}>
+          <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="#e74c3c" />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={addToLearned}>
-          <MaterialIcons name={"add-task"} size={34} color={isLearned ? "green" : "black"} />
+        <TouchableOpacity onPress={addToLearned} style={styles.iconContainer}>
+          <MaterialIcons name="add-task" size={34} color={isLearned ? '#2ecc71' : '#34495e'} />
         </TouchableOpacity>
-      </Text>
+      </View>
 
       <FlipCard
         style={styles.cardContainer}
@@ -89,16 +88,16 @@ const PlayPage = () => {
         flipVertical={false}
         flip={isFlipped}
         clickable={true}
-        onFlipEnd={(isFlipEnd) => { console.log('isFlipEnd', isFlipEnd); }}
+        onFlipEnd={(isFlipEnd) => {
+          console.log('isFlipEnd', isFlipEnd);
+        }}
       >
-        {/* Front Side */}
         <View style={[styles.card, styles.cardFront]}>
           <TouchableOpacity onPress={toggleDisplayLanguage}>
             <Text style={styles.cardText}>{displayEnglish ? words[currentIndex]?.eng : words[currentIndex]?.tr}</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Back Side */}
         <View style={[styles.card, styles.cardBack]}>
           <TouchableOpacity onPress={toggleDisplayLanguage}>
             <Text style={styles.cardText}>{displayEnglish ? words[currentIndex]?.tr : words[currentIndex]?.eng}</Text>
@@ -125,23 +124,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#ecf0f1',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  learnedButton: {
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    width: '100%',
+  },
+  iconContainer: {
     padding: 10,
     borderRadius: 5,
-    alignSelf: 'flex-end',
-    backgroundColor: '#00CC33',
-    marginBottom: 70,
-    marginTop: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
   buttonText: {
-    color: 'white',
+    color: '#fff',
     textAlign: 'center',
     fontSize: 16,
   },
@@ -149,19 +151,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   button: {
     padding: 20,
-    backgroundColor: '#999999',
-    borderRadius: 5,
-    width: '35%',
-    marginLeft: 30,
-    marginRight: 20,
-
+    backgroundColor: '#3498db',
+    borderRadius: 8,
+    width: '45%',
   },
   cardContainer: {
-    width: 200,
-    height: 300,
+    width: 300,
+    height: 400,
     justifyContent: 'center',
     marginBottom: 50,
   },
@@ -170,21 +170,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'lightblue',
+    borderColor: '#3498db',
     borderRadius: 10,
   },
   cardFront: {
-    backgroundColor: 'lightblue',
+    backgroundColor: '#3498db',
   },
   cardBack: {
-    backgroundColor: 'lightgreen',
+    backgroundColor: '#2ecc71',
   },
   cardText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black', // veya '#000'
+    color: '#34495e',
   },
 });
 
 export default PlayPage;
-

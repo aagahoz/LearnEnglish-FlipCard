@@ -4,7 +4,7 @@ import FlipCard from 'react-native-flip-card';
 import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { MaterialIcons } from '@expo/vector-icons';
-import { updateDoc } from "firebase/firestore";
+import { updateDoc } from 'firebase/firestore';
 
 const FavoritePage = () => {
   const [userData, setUserData] = useState(null);
@@ -13,8 +13,9 @@ const FavoritePage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [displayEnglish, setDisplayEnglish] = useState(true);
-  const [isFavorite, setIsFavorite] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLearned, setIsLearned] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
@@ -132,6 +133,16 @@ const FavoritePage = () => {
     });
   };
 
+  const favoriteButton = () => {
+    console.log('Favorilere Eklendi');
+    setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+  };
+
+  const removeWord = () => {
+    console.log('Kelime Çıkarıldı');
+    setIsLearned((prevIsLearned) => !prevIsLearned);
+  };
+
   const getUserId = () => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -172,11 +183,14 @@ const FavoritePage = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={{ marginBottom: 20 }}>
-        <TouchableOpacity onPress={toggleFavoriteButton}>
-          <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
-        </TouchableOpacity>
-      </Text>
+      <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={favoriteButton} style={styles.iconContainer}>
+            <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={removeWord} style={styles.iconContainer}>
+            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'black'} />
+          </TouchableOpacity>
+        </View>
 
       <FlipCard
         style={styles.cardContainer}
@@ -235,6 +249,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    width: '100%',
+  },
+  iconContainer: {
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  noWordsText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
   buttonText: {
     color: 'white',
     textAlign: 'center',
@@ -244,18 +274,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   button: {
     padding: 20,
-    backgroundColor: '#999999',
-    borderRadius: 5,
-    width: '35%',
-    marginLeft: 30,
-    marginRight: 20,
+    backgroundColor: '#3498db',
+    borderRadius: 8,
+    width: '45%',
   },
   cardContainer: {
-    width: 200,
-    height: 300,
+    width: 300,
+    height: 400,
     justifyContent: 'center',
     marginBottom: 50,
   },
@@ -279,5 +308,6 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
+
 
 export default FavoritePage;

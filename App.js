@@ -42,12 +42,12 @@ const App = () => {
               Profile: 'account',
               Favorites: 'heart',
               UnLearned: 'book',
-              Learn: 'play',
+              Play: 'play',
               Learned: 'check',
               'Sign In': 'login',
               'Sign Up': 'account-plus',
             };
-            const iconName = focused ? icons[route.name] : `${icons[route.name]}-outline`;
+            const iconName = icons[route.name];
             return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
           },
         })}
@@ -67,7 +67,7 @@ const App = () => {
             <>
               <Tab.Screen name="Favorites" component={FavoritesScreen} />
               <Tab.Screen name="UnLearned" component={UnLearnedScreen} />
-              <Tab.Screen name="Learn" component={PlayScreen} />
+              <Tab.Screen name="Play" component={PlayScreen} />
               <Tab.Screen name="Learned" component={LearnedScreen} />
               <Tab.Screen name="Settings">
                 {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} />}
