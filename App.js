@@ -26,57 +26,28 @@ const App = () => {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName={isSignedIn ? (isAdmin ? 'Home' : 'Learn') : 'SignInTab'} // Oturum açık mı kontrol et
-
+        initialRouteName={isSignedIn ? (isAdmin ? 'Home' : 'Learn') : 'SignInTab'}
         screenOptions={({ route }) => ({
           tabBarLabelStyle: {
             fontSize: 13,
             fontWeight: 'bold',
           },
-
           tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-
-            if (route.name === 'Home')
-            {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Users')
-            {
-              iconName = focused ? 'account-group' : 'account-group-outline';
-            } else if (route.name === 'Words')
-            {
-              iconName = focused ? 'book' : 'book-outline';
-            } else if (route.name === 'Add Word')
-            {
-              iconName = focused ? 'plus-circle' : 'plus-circle-outline';
-            } else if (route.name === 'Settings')
-            {
-              iconName = focused ? 'cog' : 'cog-outline';
-            } else if (route.name === 'Profile')
-            {
-              iconName = focused ? 'account' : 'account-outline';
-            }
-            else if (route.name === 'Favorites')
-            {
-              iconName = focused ? 'heart' : 'heart-outline';
-            }
-            else if (route.name === 'UnLearned')
-            {
-              iconName = focused ? 'book' : 'book-outline';
-            }
-            else if (route.name === 'Learn')
-            {
-              iconName = focused ? 'play' : 'play-outline';
-            } else if (route.name === 'Learned')
-            {
-              iconName = focused ? 'check' : 'check-outline';
-            } else if (route.name === 'Sign In')
-            {
-              iconName = focused ? 'login' : 'login-variant';
-            } else if (route.name === 'Sign Up')
-            {
-              iconName = focused ? 'account-plus' : 'account-plus-outline';
-            }
+            const icons = {
+              Home: 'home',
+              Users: 'account-group',
+              Words: 'book',
+              'Add Word': 'plus-circle',
+              Settings: 'cog',
+              Profile: 'account',
+              Favorites: 'heart',
+              UnLearned: 'book',
+              Learn: 'play',
+              Learned: 'check',
+              'Sign In': 'login',
+              'Sign Up': 'account-plus',
+            };
+            const iconName = focused ? icons[route.name] : `${icons[route.name]}-outline`;
             return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
           },
         })}
@@ -84,36 +55,20 @@ const App = () => {
         {isSignedIn ? (
           isAdmin ? (
             <>
-              <Tab.Screen name="Home">
-                {(props) => <HomeScreenAdmin {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
-              </Tab.Screen>
-              <Tab.Screen name="Users">
-                {(props) => <UsersScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
-              </Tab.Screen>
-              <Tab.Screen name="Words">
-                {(props) => <WordsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
-              </Tab.Screen>
-              <Tab.Screen name="Add Word">
-                {(props) => <AddWordScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
-              </Tab.Screen>
+              <Tab.Screen name="Home" component={HomeScreenAdmin} />
+              <Tab.Screen name="Users" component={UsersScreen} />
+              <Tab.Screen name="Words" component={WordsScreen} />
+              <Tab.Screen name="Add Word" component={AddWordScreen} />
               <Tab.Screen name="Settings">
-                {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} setIsAdmin={setIsAdmin} />}
+                {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} />}
               </Tab.Screen>
             </>
           ) : (
             <>
-              <Tab.Screen name="Favorites">
-                {(props) => <FavoritesScreen {...props} setIsSignedIn={setIsSignedIn} />}
-              </Tab.Screen>
-              <Tab.Screen name="UnLearned">
-                {(props) => <UnLearnedScreen {...props} setIsSignedIn={setIsSignedIn} />}
-              </Tab.Screen>
-              <Tab.Screen name="Learn">
-                {(props) => <PlayScreen {...props} setIsSignedIn={setIsSignedIn} />}
-              </Tab.Screen>
-              <Tab.Screen name="Learned">
-                {(props) => <LearnedScreen {...props} setIsSignedIn={setIsSignedIn} />}
-              </Tab.Screen>
+              <Tab.Screen name="Favorites" component={FavoritesScreen} />
+              <Tab.Screen name="UnLearned" component={UnLearnedScreen} />
+              <Tab.Screen name="Learn" component={PlayScreen} />
+              <Tab.Screen name="Learned" component={LearnedScreen} />
               <Tab.Screen name="Settings">
                 {(props) => <SettingsScreen {...props} setIsSignedIn={setIsSignedIn} />}
               </Tab.Screen>

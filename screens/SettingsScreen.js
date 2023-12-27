@@ -10,7 +10,7 @@ export default function SettingsPage ({ setIsSignedIn }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -23,9 +23,9 @@ export default function SettingsPage ({ setIsSignedIn }) {
 
   const handleChangePassword = async () => {
     try {
-      setError(''); 
-      setSuccessMessage(''); 
-      setIsLoading(true); // Set loading to true
+      setError('');
+      setSuccessMessage('');
+      setIsLoading(true);
 
       const user = auth.currentUser;
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
@@ -50,7 +50,7 @@ export default function SettingsPage ({ setIsSignedIn }) {
       console.error('Password Change Error:', error.message);
       setError('Password change failed. Please try again.');
     } finally {
-      setIsLoading(false); // Set loading to false, regardless of success or failure
+      setIsLoading(false);
     }
   };
 
@@ -99,25 +99,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 50,
+    backgroundColor: '#f8f8f8',
+    paddingHorizontal: 20,
   },
   buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    justifyContent: 'center',
-    fontSize: 15,
     color: 'black',
+    textAlign: 'center',
+    fontSize: 16,
   },
   logoutButton: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#e74c3c',
+    padding: 12,
+    borderRadius: 8,
     position: 'absolute',
     top: 30,
     right: 30,
-    justifyContent: 'center',
-    
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   changePasswordContainer: {
     width: '100%',
@@ -125,32 +123,35 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
     marginBottom: 10,
+    color: '#333',
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 8,
     marginBottom: 10,
     padding: 10,
     width: '100%',
+    color: '#333',
   },
   button: {
     backgroundColor: '#007BFF',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 10,
     width: '100%',
     alignItems: 'center',
   },
   errorText: {
-    color: 'red',
+    color: '#e74c3c',
     textAlign: 'center',
     marginTop: 10,
   },
   successText: {
-    color: 'green',
+    color: '#2ecc71',
     textAlign: 'center',
     marginTop: 10,
   },
 });
+

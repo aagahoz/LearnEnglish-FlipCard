@@ -13,8 +13,8 @@ const AddWordPage = ({ navigation, setWord }) => {
     const fetchWords = async () => {
       try {
         const firestore = getFirestore();
-        const WordsCollection = collection(firestore, 'Words');
-        const wordsSnapshot = await getDocs(WordsCollection);
+        const wordsCollection = collection(firestore, 'Words');
+        const wordsSnapshot = await getDocs(wordsCollection);
         const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
         setExistingWords(wordsData);
       } catch (error) {
@@ -36,22 +36,29 @@ const AddWordPage = ({ navigation, setWord }) => {
   const addWord = async () => {
     try {
       setIsLoading(true);
-
-      const isEngExists = existingWords.some((word) => word.eng === eng);
-      const isTrExists = existingWords.some((word) => word.tr === tr);
-
+  
+      const isEngExists = existingWords.some((word) => word.eng.toLowerCase() === eng.toLowerCase());
+      const isTrExists = existingWords.some((word) => word.tr.toLowerCase() === tr.toLowerCase());
+  
       if (isEngExists || isTrExists) {
         setFeedbackMessage('Error: Word already exists in the table');
       } else {
         const firestore = getFirestore();
-        const WordsCollection = collection(firestore, 'Words');
-        const newWordRef = await addDoc(WordsCollection, { eng, tr, isActive: true });
-
-        setFeedbackMessage('New Word Added: ' + eng + ' - ' + tr);
+        const wordsCollection = collection(firestore, 'Words');
+        const newWordRef = await addDoc(wordsCollection, {
+          eng: capitalizeFirstLetter(eng),
+          tr: capitalizeFirstLetter(tr),
+          isActive: true,
+        });
+  
+        setFeedbackMessage('New Word Added: ' + capitalizeFirstLetter(eng) + ' - ' + capitalizeFirstLetter(tr));
         setTr('');
         setEng('');
-
-        setExistingWords((prevWords) => [...prevWords, { eng, tr, isActive: true }]);
+  
+        setExistingWords((prevWords) => [
+          ...prevWords,
+          { eng: capitalizeFirstLetter(eng), tr: capitalizeFirstLetter(tr), isActive: true },
+        ]);
       }
     } catch (error) {
       console.error('Error adding word:', error);
@@ -60,13 +67,33 @@ const AddWordPage = ({ navigation, setWord }) => {
       setIsLoading(false);
     }
   };
+  
+  const capitalizeFirstLetter = (word) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Add a New Word</Text>
-      <TextInput style={styles.input} placeholder="English" value={eng} onChangeText={setEng} />
-      <TextInput style={styles.input} placeholder="Turkish" value={tr} onChangeText={setTr} />
-      <TouchableOpacity style={styles.addButton} onPress={addWord} disabled={isLoading}>
+      <TextInput
+        style={styles.input}
+        placeholder="English"
+        value={eng}
+        onChangeText={setEng}
+        placeholderTextColor="#555"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Turkish"
+        value={tr}
+        onChangeText={setTr}
+        placeholderTextColor="#555"
+      />
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={addWord}
+        disabled={isLoading}
+        activeOpacity={0.8}>
         {isLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
@@ -96,26 +123,31 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#007BFF',
   },
   input: {
     width: '80%',
     height: 40,
     padding: 10,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: '#007BFF',
     marginBottom: 20,
     borderRadius: 5,
+    color: '#333',
   },
   addButton: {
     backgroundColor: '#007BFF',
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
     marginBottom: 10,
     alignItems: 'center',
+    width: '80%',
   },
   buttonText: {
     color: '#fff',
     textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

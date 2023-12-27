@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    marginBottom: 20,
+    marginBottom: 10,
     borderRadius: 5,
   },
   linkText: {
@@ -161,4 +161,4 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
-})
+});

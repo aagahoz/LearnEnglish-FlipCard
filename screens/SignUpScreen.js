@@ -1,4 +1,6 @@
+import React, { useState } from 'react';
 import {
+  View,
   Text,
   TextInput,
   TouchableOpacity,
@@ -7,38 +9,35 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-
-import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from "../firebaseConfig";
+import { auth } from '../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { AntDesign } from '@expo/vector-icons';
 
 export default function SignUpPage({ navigation, setIsSignedIn }) {
-  let [email, setEmail] = useState("");
-  let [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  let [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  let signUp = async () => {
+  const signUp = async () => {
     try {
-      setLoading(true); // Set loading to true when sign-up begins
+      setLoading(true);
 
-      if (email !== "" && password !== "" && confirmPassword !== "") {
+      if (email !== '' && password !== '' && confirmPassword !== '') {
         if (await checkEmailExists(email)) {
-          console.log("Email Already Exist");
+          setErrorMessage('Email Already Exists');
         } else {
           if (password === confirmPassword) {
             createUserWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
-                console.log(userCredential.user);
                 setIsSignedIn(true);
-                setErrorMessage("");
-                setEmail("");
-                setPassword("");
+                setErrorMessage('');
+                setEmail('');
+                setPassword('');
                 setConfirmPassword('');
                 const auth = getAuth();
                 const user = auth.currentUser;
@@ -47,16 +46,15 @@ export default function SignUpPage({ navigation, setIsSignedIn }) {
               .catch((error) => {
                 setErrorMessage(error.message);
               });
-
           } else {
-            setErrorMessage("Passwords do not match");
+            setErrorMessage('Passwords do not match');
           }
         }
       } else {
-        setErrorMessage("Please enter an email, password, and confirm password");
+        setErrorMessage('Please enter an email, password, and confirm password');
       }
     } finally {
-      setLoading(false); // Set loading to false when sign-up is complete (success or failure)
+      setLoading(false);
     }
   };
 
@@ -147,22 +145,12 @@ export default function SignUpPage({ navigation, setIsSignedIn }) {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  errorMessage: {
-    color: 'red',
-    marginBottom: 20,
   },
   input: {
     width: '80%',

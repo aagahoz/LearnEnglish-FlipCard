@@ -76,10 +76,26 @@ const UsersPage = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.userItem}>
-      <Text>ID: {item.id}</Text>
-      <Text>Email: {item.email}</Text>
-      <Text>isAdmin: {item.isAdmin ? 'Yes' : 'No'}</Text>
-      <Text>isActive: {item.isActive ? 'Yes' : 'No'}</Text>
+      <View style={styles.userInfoContainer}>
+        <Text style={styles.userInfoTitle}>ID:</Text>
+        <Text style={styles.userInfoText}>{item.id}</Text>
+      </View>
+      <View style={styles.userInfoContainer}>
+        <Text style={styles.userInfoTitle}>Email:</Text>
+        <Text style={styles.userInfoText}>{item.email}</Text>
+      </View>
+      <View style={styles.userInfoContainer}>
+        <Text style={styles.userInfoTitle}>Status:</Text>
+        <Text style={[styles.userInfoText, item.isActive ? styles.activeText : styles.inactiveText]}>
+          {item.isActive ? 'Active' : 'Inactive'}
+        </Text>
+      </View>
+      <View style={styles.userInfoContainer}>
+        <Text style={styles.userInfoTitle}>Role:</Text>
+        <Text style={[styles.userInfoText, item.isAdmin ? styles.adminText : styles.userText]}>
+          {item.isAdmin ? 'Admin' : 'User'}
+        </Text>
+      </View>
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={[styles.actionButton, styles.blueButton]} onPress={() => makeAdmin(item.id)}>
           <Text>Make Admin</Text>
@@ -96,6 +112,7 @@ const UsersPage = () => {
       </View>
     </View>
   );
+  
 
   if (isLoading) {
     return (
@@ -118,13 +135,12 @@ const UsersPage = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#f7f7f7',
     paddingTop: 20,
-    backgroundColor: '#fff',
+    paddingHorizontal: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -135,36 +151,77 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#3498db', // Updated color to a blue shade
+    textAlign: 'center', // Center align the text
+    textTransform: 'uppercase', // Uppercase the text
   },
   userList: {
     width: '100%',
   },
   userItem: {
-    padding: 8,
-    borderBottomWidth: 5,
-    borderBottomColor: '#ccc',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   actionsContainer: {
+    flexDirection: 'column',
+    marginTop: 10,
+  },
+  buttonRow: {
     flexDirection: 'row',
     marginTop: 10,
   },
   actionButton: {
-    marginRight: 5,
-    padding: 4,
-    borderRadius: 5,
+    marginVertical: 4, // Added vertical margin
+    marginRight: 8,
+    padding: 8,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   greenButton: {
-    backgroundColor: '#00CC33',
+    backgroundColor: '#2ecc71',
   },
   redButton: {
-    backgroundColor: '#CC6633',
+    backgroundColor: '#e74c3c',
   },
   blueButton: {
-    backgroundColor: '#ADD8E6',
+    backgroundColor: '#3498db',
   },
   yellowButton: {
-    backgroundColor: '#CCCC00',
+    backgroundColor: '#f39c12',
   },
+  userItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  userInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  userInfoTitle: {
+    fontWeight: 'bold',
+    marginRight: 8,
+  },
+  userInfoText: {
+    fontSize: 16,
+    color: '#555',
+  },
+  activeText: {
+    color: '#2ecc71', // Green color for active
+  },
+  inactiveText: {
+    color: '#e74c3c', // Red color for inactive
+  },
+  adminText: {
+    color: '#3498db', // Blue color for admin
+  },
+  userText: {
+    color: '#f39c12', // Orange color for user
+  },
+
 });
+
 
 export default UsersPage;
