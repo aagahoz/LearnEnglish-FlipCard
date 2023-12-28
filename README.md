@@ -1,4 +1,4 @@
-# English Learning App with React Native
+<img width="501" alt="Screenshot 2023-12-28 at 10 37 11" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/c988f58e-6d9e-4883-9380-2950e028f713"># English Learning App with React Native
 
 #### Bu proje, React Native kullanılarak geliştirilmiş bir İngilizce öğrenme uygulamasını içermektedir. Uygulama, kelime kartları üzerinden bir "flip card" mantığı ile çalışmaktadır, bu da kullanıcıların hem kelime bilgisini hem de kelimenin karşılığını öğrenmelerine olanak tanır.
 
@@ -13,28 +13,58 @@
 
 
 ## Flip Card
-![ezgif com-video-to-gif-converted](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/daa5d4ec-731c-47a0-b129-fa66e82840b2)
+
+
 
 #### Sign In Screen
-![Screenshot 2023-12-23 at 00 10 31](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/79fdd21d-21e6-4935-a52c-24f1b1d73ef7)
+
+<img width="501" alt="Screenshot 2023-12-28 at 10 33 11" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/a42dcee4-5984-465b-858b-d286d149141a">
+
 
 #### Sign Up Screen
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/361d25f2-4762-4d82-b9f1-9d43be7460c7)
 
-#### Learn Screen
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/d36e5f50-73db-4f30-b807-f1e83a30cd35)
+<img width="501" alt="Screenshot 2023-12-28 at 10 33 35" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/bc16823f-4556-4257-816a-e59f799898d7">
 
 #### Settings Screen
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/1b749b56-1ea3-431d-a9bc-595d7def2710)
+<img width="501" alt="Screenshot 2023-12-28 at 10 37 28" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/09ac0251-ca80-4873-9189-bb855993e275">
+
+#### Learn Screen ( User )
+![Screenshot 2023-12-28 at 10 37 04](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/d6a54f79-7072-407b-ae6d-4b0ad2231bf9)
+
+#### Favorites Screen ( User )
+
+<img width="501" alt="Screenshot 2023-12-28 at 10 37 11" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/3cdfea71-b9a8-4947-98d5-97bdb27c3c8a">
+
+
+
+#### Learned Screen ( User )
+
+<img width="501" alt="Screenshot 2023-12-28 at 10 44 38" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/c3778dcd-15a0-4f70-bf8f-76b87b81a444">
+
+
+#### UnLearned Screen ( User )
+
+<img width="501" alt="Screenshot 2023-12-28 at 10 37 09" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/16763a89-c84c-4a63-b3f8-c98e491e0e68">
+
+
+#### Admin Home Screen ( Admin )
+
+<img width="501" alt="Screenshot 2023-12-28 at 10 42 50" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/f1c3e2fe-4ed2-4fbb-acd2-2583d18c61e6">
+
 
 #### Users Screen ( Admin )
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/deceb698-74c5-4bfb-8803-7f23651cca6c)
+<img width="501" alt="Screenshot 2023-12-28 at 10 33 54" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/eb045038-961e-415a-ba90-85b855bb3ee8">
+
+
 
 #### Words Screen ( Admin )
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/c0c9c426-f48e-459e-9c1c-2d65aea8d42e)
+<img width="501" alt="Screenshot 2023-12-28 at 10 45 05" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/8fb4a22d-ef4e-4f51-bd0f-3326d8a24ad4">
+
+
 
 #### Add Word Screen ( Admin )
-![image](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/ddca8a8d-97b7-4c52-a7ec-423d4de1de7f)
+<img width="501" alt="Screenshot 2023-12-28 at 10 33 59" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/e49ac23e-f691-47c1-9dd3-4502413cd869">
+
 
 
 ### Kullanılan Teknolojiler
