@@ -8,7 +8,7 @@
 * Kullanıcı paneli ile Favoriye alınmış, öğrenilmiş, öğrenilmemiş, yeni kelime öğren gibi ekranlar
 
 
-### Ekran Görüntüleri
+# Ekran Görüntüleri
 
 
 ## Flip Card
