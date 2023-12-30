@@ -5,6 +5,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { getFirestore, collection, getDocs, doc, updateDoc, arrayUnion, query, where } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
+/*
+TODO Sayfa ilk açıldığında ilk kelimenin favorited-learned kontrolü eksik.
+TODO Sayfa ilk açıldığında back butonu kapatılmıyor.
+*/
 
 const PlayPage = () => {
   const [words, setWords] = useState([]);
@@ -14,11 +18,13 @@ const PlayPage = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLearned, setIsLearned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBackHave, setIsBackHave] = useState(true);
+  const [isNextHave, setIsNextHave] = useState(true);
 
   useEffect(() => {
     fetchWords();
+    
   }, []);
-
 
   const fetchWords = async () => {
     try {
@@ -26,6 +32,7 @@ const PlayPage = () => {
       const wordsCollection = collection(firestore, 'Words');
       const wordsSnapshot = await getDocs(wordsCollection);
       const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
+
       setWords(wordsData);
       setIsLoading(false);
     } catch (error) {
@@ -47,51 +54,79 @@ const PlayPage = () => {
     setDisplayEnglish((prevDisplay) => !prevDisplay);
   };
 
-  const goNext = () => {
+  const goNext = async () => {
+    const isLearned = await isWordInLearnedArray(getNextWordID());
+    const isFavorite = await isWordInFavoritesArray(getNextWordID());
+
     if (currentIndex < words.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false);
     }
+
+    if (currentIndex === words.length - 2) {
+      setIsNextHave(false);
+    }
+    if (currentIndex === 0) {
+      setIsBackHave(true);
+    }
+
+    setIsLearned(isLearned);
+    setIsFavorite(isFavorite);
   };
 
-  const goBack = () => {
+  const goBack = async () => {
+    const isLearned = await isWordInLearnedArray(getPrevWordID());
+    const isFavorite = await isWordInFavoritesArray(getPrevWordID());
+
     if (currentIndex > 0) {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false);
     }
+    
+    if (currentIndex === 1) {
+      setIsBackHave(false);
+    }
+    if (currentIndex === words.length - 1) {
+      setIsNextHave(true);
+    }
+
+    setIsLearned(isLearned);
+    setIsFavorite(isFavorite);
   };
 
   const addToLearned = () => {
+    if (isLearned) {
+      removeWordFromLearned();
+    }
+    else {
+      addWordToLearned();
+    }
     setIsLearned((prevIsLearned) => !prevIsLearned);
-    addWordToLearned();
   };
 
   const favoriteButton = () => {
-    addWordToFavorites();
-    // setIsFavorite((prevIsFavorite) => !prevIsFavorite);
-    setIsFavorite(true);
+      if (isFavorite) {
+        removeWordFromFavorites();
+      }
+      else {
+        addWordToFavorites();
+      }
+      setIsFavorite((prevIsFavorite) => !prevIsFavorite);
   };
 
   const addWordToLearned = async () => {
     try {
       const firestore = getFirestore();
-
-      // Oturum açan kullanıcının email bilgisini al
       const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
-
-      // Kullanıcıyı bulmak için sorgu oluştur
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
 
-      // Kullanıcı belgesini al
       if (!userSnapshot.empty) {
         const userDoc = userSnapshot.docs[0];
         const userId = userDoc.id;
 
-        // Öğrenilen kelimeler array'ine kelimenin ID'sini ekle
         const userDataUpdate = { learnedWords: arrayUnion(words[currentIndex].id) };
 
-        // Kullanıcı belgesini güncelle
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
 
         console.log('Word marked as learned for the user');
@@ -106,23 +141,16 @@ const PlayPage = () => {
   const addWordToFavorites = async () => {
     try {
       const firestore = getFirestore();
-
-      // Oturum açan kullanıcının email bilgisini al
       const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
-
-      // Kullanıcıyı bulmak için sorgu oluştur
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
 
-      // Kullanıcı belgesini al
       if (!userSnapshot.empty) {
         const userDoc = userSnapshot.docs[0];
         const userId = userDoc.id;
 
-        // Öğrenilen kelimeler array'ine kelimenin ID'sini ekle
         const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
 
-        // Kullanıcı belgesini güncelle
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
 
         console.log('Word marked as favorited for the user');
@@ -133,7 +161,64 @@ const PlayPage = () => {
       console.error('Error updating user data:', error);
     }
   };
- 
+
+  const removeWordFromLearned = async () => {
+    const firestore = getFirestore();
+    const currentUserEmail = getUserEmail();
+    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+    const userQuerySnapshot = await getDocs(userQuery);
+    const userData = userQuerySnapshot.docs[0].data();
+    const learnedWordsIds = userData.learnedWords || [];
+    const currentWordId = words[currentIndex].id;
+    const newLearnedWordsIds = learnedWordsIds.filter((wordId) => wordId !== currentWordId);
+    const userId = userQuerySnapshot.docs[0].id;
+    const userDataUpdate = { learnedWords: newLearnedWordsIds };
+    await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+    console.log('Word removed from learned for the user');
+  };
+
+  const removeWordFromFavorites = async () => {
+    const firestore = getFirestore();
+    const currentUserEmail = getUserEmail();
+    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+    const userQuerySnapshot = await getDocs(userQuery);
+    const userData = userQuerySnapshot.docs[0].data();
+    const favoritesWordsIds = userData.favoritesWords || [];
+    const currentWordId = words[currentIndex].id;
+    const newFavoritesWordsIds = favoritesWordsIds.filter((wordId) => wordId !== currentWordId);
+    const userId = userQuerySnapshot.docs[0].id;
+    const userDataUpdate = { favoritesWords: newFavoritesWordsIds };
+    await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+    console.log('Word removed from favorites for the user');
+  };
+
+  const isWordInLearnedArray = async (WordID) => {
+    // get user learnedWords array
+    const firestore = getFirestore();
+    const currentUserEmail = getUserEmail();
+    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+    const userQuerySnapshot = await getDocs(userQuery);
+    const userData = userQuerySnapshot.docs[0].data();
+    const learnedWordsIds = userData.learnedWords || [];
+    const currentWordId = WordID;
+    const isWordinLearnedArray = learnedWordsIds.includes(currentWordId);
+
+    return isWordinLearnedArray;
+  };
+
+  const isWordInFavoritesArray = async (WordID) => {
+    // get user learnedWords array
+    const firestore = getFirestore();
+    const currentUserEmail = getUserEmail();
+    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+    const userQuerySnapshot = await getDocs(userQuery);
+    const userData = userQuerySnapshot.docs[0].data();
+    const favoritesWordsIds = userData.favoritesWords || [];
+    const currentWordId = WordID;
+    const isWordinFavoritesArray = favoritesWordsIds.includes(currentWordId);
+    
+    return isWordinFavoritesArray;
+  }
 
   const getUserEmail = () => {
     const auth = getAuth();
@@ -142,23 +227,24 @@ const PlayPage = () => {
     return currentUserEmail;
   }
 
+  const getNextWordID = () => {
+    const maxIndex = words.length - 1;
+    if (currentIndex < maxIndex) {
+      const nextWordId = words[currentIndex + 1].id;
+      return nextWordId;
+    } else {
+      return null;
+    }
+  }
 
-
-
-
-
-  
-
-
-
-
-  
-
-  
-
-
-
-
+  const getPrevWordID = () => {
+    if (currentIndex > 0) {
+      const prevWordId = words[currentIndex - 1].id;
+      return prevWordId;
+    } else {
+      return null;
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -198,11 +284,11 @@ const PlayPage = () => {
       </FlipCard>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={goBack} style={styles.button}>
+        <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
           <Text style={styles.buttonText}>Back</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={goNext} style={styles.button}>
+        <TouchableOpacity onPress={goNext} style={styles.button} disabled={!isNextHave}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
