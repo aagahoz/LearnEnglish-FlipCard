@@ -115,7 +115,7 @@ const LearnedPage = () => {
             <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
           </TouchableOpacity>
           <TouchableOpacity onPress={removeWord} style={styles.iconContainer}>
-            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'black'} />
+            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'green'} />
           </TouchableOpacity>
         </View>
       ) : (

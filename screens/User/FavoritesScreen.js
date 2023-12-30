@@ -21,10 +21,12 @@ const FavoritePage = () => {
     const auth = getAuth();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if (user)
+      {
         setUserEmail(user.email);
         fetchUserData(user.email);
-      } else {
+      } else
+      {
         setUserEmail(null);
         setUserData(null);
         setFavoritesWordsData([]);
@@ -36,18 +38,21 @@ const FavoritePage = () => {
   }, []);
 
   const fetchUserData = async (email) => {
-    try {
+    try
+    {
       const firestore = getFirestore();
 
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
       const userQuerySnapshot = await getDocs(userQuery);
 
-      if (userQuerySnapshot.size > 0) {
+      if (userQuerySnapshot.size > 0)
+      {
         const userData = userQuerySnapshot.docs[0].data();
         setUserData(userData);
 
         const favoritesWordsIds = userData.favoritesWords || [];
-        if (favoritesWordsIds.length === 0) {
+        if (favoritesWordsIds.length === 0)
+        {
           setFavoritesWordsData([]);
           setIsLoading(false);
           return;
@@ -56,9 +61,11 @@ const FavoritePage = () => {
           const wordDocRef = doc(firestore, 'Words', wordId);
           const wordDocSnapshot = await getDoc(wordDocRef);
 
-          if (wordDocSnapshot.exists()) {
+          if (wordDocSnapshot.exists())
+          {
             return wordDocSnapshot.data();
-          } else {
+          } else
+          {
             return null;
           }
         });
@@ -68,7 +75,8 @@ const FavoritePage = () => {
         setFavoritesWordsData(wordsData.filter((word) => word !== null));
         setIsLoading(false);
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error fetching user data:', error);
       setIsLoading(false);
     }
@@ -80,14 +88,16 @@ const FavoritePage = () => {
   };
 
   const goNext = () => {
-    if (currentIndex < favoritesWordsData.length - 1) {
+    if (currentIndex < favoritesWordsData.length - 1)
+    {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false);
     }
   };
 
   const goBack = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false);
     }
@@ -96,9 +106,11 @@ const FavoritePage = () => {
   const toggleFavoriteButton = async () => {
     const currentWordID = getCurrentWordID();
 
-    if (isFavorite) {
+    if (isFavorite)
+    {
       removeFromFavorite(currentWordID);
-    } else {
+    } else
+    {
       addToFavorite(currentWordID);
     }
 
@@ -164,7 +176,8 @@ const FavoritePage = () => {
   const addWordToFavoriteWordsIDsArray = (currentWordID) => {
     const favoriteWordsIDs = getFavoriteWordsIDs();
 
-    if (favoriteWordsIDs.includes(currentWordID)) {
+    if (favoriteWordsIDs.includes(currentWordID))
+    {
       return favoriteWordsIDs;
     }
 
@@ -172,7 +185,8 @@ const FavoritePage = () => {
     return newFavoriteWordsIDs;
   };
 
-  if (isLoading) {
+  if (isLoading)
+  {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="blue" />
@@ -184,13 +198,13 @@ const FavoritePage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={favoriteButton} style={styles.iconContainer}>
-            <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={removeWord} style={styles.iconContainer}>
-            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'black'} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={favoriteButton} style={styles.iconContainer}>
+          <MaterialIcons name={isFavorite ? 'favorite' : 'favorite'} size={34} color="red" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={removeWord} style={styles.iconContainer}>
+          <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'black'} />
+        </TouchableOpacity>
+      </View>
 
       <FlipCard
         style={styles.cardContainer}

@@ -15,6 +15,7 @@ const UnLearnedPage = () => {
   const [isLearned, setIsLearned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+
   useEffect(() => {
     const auth = getAuth();
 
@@ -82,6 +83,7 @@ const UnLearnedPage = () => {
     console.log('Favorilere Eklendi');
     setIsFavorite((prevIsFavorite) => !prevIsFavorite);
   };
+
 
   if (isLoading) {
     return (

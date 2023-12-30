@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import FlipCard from 'react-native-flip-card';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
+import { getFirestore, collection, getDocs, doc, updateDoc, arrayUnion, query, where } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
 
 const PlayPage = () => {
   const [words, setWords] = useState([]);
@@ -16,6 +18,7 @@ const PlayPage = () => {
   useEffect(() => {
     fetchWords();
   }, []);
+
 
   const fetchWords = async () => {
     try {
@@ -59,14 +62,103 @@ const PlayPage = () => {
   };
 
   const addToLearned = () => {
-    console.log('Kelime Eklendi');
     setIsLearned((prevIsLearned) => !prevIsLearned);
+    addWordToLearned();
   };
 
   const favoriteButton = () => {
-    console.log('changeFavorite');
-    setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+    addWordToFavorites();
+    // setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+    setIsFavorite(true);
   };
+
+  const addWordToLearned = async () => {
+    try {
+      const firestore = getFirestore();
+
+      // Oturum açan kullanıcının email bilgisini al
+      const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
+
+      // Kullanıcıyı bulmak için sorgu oluştur
+      const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+      const userSnapshot = await getDocs(userQuery);
+
+      // Kullanıcı belgesini al
+      if (!userSnapshot.empty) {
+        const userDoc = userSnapshot.docs[0];
+        const userId = userDoc.id;
+
+        // Öğrenilen kelimeler array'ine kelimenin ID'sini ekle
+        const userDataUpdate = { learnedWords: arrayUnion(words[currentIndex].id) };
+
+        // Kullanıcı belgesini güncelle
+        await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+
+        console.log('Word marked as learned for the user');
+      } else {
+        console.log('User not found');
+      }
+    } catch (error) {
+      console.error('Error updating user data:', error);
+    }
+  };
+
+  const addWordToFavorites = async () => {
+    try {
+      const firestore = getFirestore();
+
+      // Oturum açan kullanıcının email bilgisini al
+      const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
+
+      // Kullanıcıyı bulmak için sorgu oluştur
+      const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+      const userSnapshot = await getDocs(userQuery);
+
+      // Kullanıcı belgesini al
+      if (!userSnapshot.empty) {
+        const userDoc = userSnapshot.docs[0];
+        const userId = userDoc.id;
+
+        // Öğrenilen kelimeler array'ine kelimenin ID'sini ekle
+        const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
+
+        // Kullanıcı belgesini güncelle
+        await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+
+        console.log('Word marked as favorited for the user');
+      } else {
+        console.log('User not found');
+      }
+    } catch (error) {
+      console.error('Error updating user data:', error);
+    }
+  };
+ 
+
+  const getUserEmail = () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    const currentUserEmail = currentUser.email;
+    return currentUserEmail;
+  }
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  
+
+
+
+
 
   return (
     <View style={styles.container}>
