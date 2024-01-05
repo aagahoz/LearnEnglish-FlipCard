@@ -32,6 +32,8 @@ const App = () => {
             fontSize: 13,
             fontWeight: 'bold',
           },
+          unmountOnBlur: true,
+
           tabBarIcon: ({ focused, color, size }) => {
             const icons = {
               Home: 'home',
