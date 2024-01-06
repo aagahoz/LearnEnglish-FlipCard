@@ -19,15 +19,17 @@ const LearnedPage = () => {
   const [isBackHave, setIsBackHave] = useState(true);
   const [isNextHave, setIsNextHave] = useState(true);
 
-  
+
   useEffect(() => {
     const auth = getAuth();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if (user)
+      {
         setUserEmail(user.email);
         fetchUserLearnedWords(user.email);
-      } else {
+      } else
+      {
         setUserEmail(null);
         setUserData(null);
         setLearnedWordsData([]);
@@ -37,39 +39,6 @@ const LearnedPage = () => {
 
     return () => unsubscribe();
   }, []);
-
-  const fetchUserLearnedWords = async (email) => {
-    try {
-      const firestore = getFirestore();
-      const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
-      const userQuerySnapshot = await getDocs(userQuery);
-      const userData = userQuerySnapshot.docs[0].data();
-      setUserData(userData);
-      const learnedWordsIds = userData.learnedWords || [];
-      const learnedWordsData = [];
-      for (let i = 0; i < learnedWordsIds.length; i++) {
-        const wordId = learnedWordsIds[i];
-        const wordDoc = await getDoc(doc(firestore, 'Words', wordId));
-        const wordData = wordDoc.data();
-        learnedWordsData.push({ id: wordId, ...wordData });
-      }
-      setLearnedWordsData(learnedWordsData);
-      setWords(learnedWordsData);
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error fetching user learned words:', error);
-    }
-      
-  };
-
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="blue" />
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
 
   const toggleDisplayLanguage = () => {
     setIsFlipped(true);
@@ -83,25 +52,23 @@ const LearnedPage = () => {
     const isFavorite = await isWordInFavoritesArray(getNextWordID());
 
 
-    if (currentIndex < words.length - 1) {
+    if (currentIndex < words.length - 1)
+    {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false);
     }
 
-    if (currentIndex === words.length - 2) {
+    if (currentIndex === words.length - 2)
+    {
       setIsNextHave(false);
     }
-    if (currentIndex === 0) {
+    if (currentIndex === 0)
+    {
       setIsBackHave(true);
     }
 
     setIsLearned(isLearned);
     setIsFavorite(isFavorite);
-
-
-
-    
-    
   };
 
   const goBack = async () => {
@@ -109,25 +76,27 @@ const LearnedPage = () => {
     const isLearned = await isWordInLearnedArray(getPrevWordID());
     const isFavorite = await isWordInFavoritesArray(getPrevWordID());
 
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false);
     }
-    
-    if (currentIndex === 1) {
+
+    if (currentIndex === 1)
+    {
       setIsBackHave(false);
     }
-    if (currentIndex === words.length - 1) {
+    if (currentIndex === words.length - 1)
+    {
       setIsNextHave(true);
     }
 
     setIsLearned(isLearned);
     setIsFavorite(isFavorite);
-    
+
   };
 
   const isWordInLearnedArray = async (WordID) => {
-    // get user learnedWords array
     const firestore = getFirestore();
     const currentUserEmail = getUserEmail();
     const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
@@ -150,53 +119,66 @@ const LearnedPage = () => {
     const favoritesWordsIds = userData.favoritesWords || [];
     const currentWordId = WordID;
     const isWordinFavoritesArray = favoritesWordsIds.includes(currentWordId);
-    
+
     return isWordinFavoritesArray;
   }
 
   const getNextWordID = () => {
     const maxIndex = words.length - 1;
-    console.log("max index : ", maxIndex);
-    console.log("current index : ", currentIndex);
-    console.log("word length : ", words.length)
-
-
-    if (currentIndex < maxIndex) {
+    if (currentIndex < maxIndex)
+    {
       const nextWordId = words[currentIndex + 1].id;
       return nextWordId;
-    } else {
+    } else
+    {
       return null;
     }
   }
 
   const getPrevWordID = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       const prevWordId = words[currentIndex - 1].id;
       return prevWordId;
-    } else {
+    } else
+    {
       return null;
     }
   }
 
+  const fetchUserFirstLearnedWord = () => {
+    const firestore = getFirestore();
+    const currentUserEmail = getUserEmail();
+    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+    const userQuerySnapshot = getDocs(userQuery);
+    const userData = userQuerySnapshot.docs[0].data();
+    const learnedWordsIds = userData.learnedWords || [];
+    const firstWordId = learnedWordsIds[0];
+    return firstWordId;
+  };
+
   const addToLearned = () => {
-    if (isLearned) {
+    if (isLearned)
+    {
       removeWordFromLearned();
     }
-    else {
+    else
+    {
       addWordToLearned();
     }
     setIsLearned((prevIsLearned) => !prevIsLearned);
   };
 
-
   const addWordToLearned = async () => {
-    try {
+    try
+    {
       const firestore = getFirestore();
       const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
 
-      if (!userSnapshot.empty) {
+      if (!userSnapshot.empty)
+      {
         const userDoc = userSnapshot.docs[0];
         console.log('userDoc', userDoc);
         const userId = userDoc.id;
@@ -206,10 +188,12 @@ const LearnedPage = () => {
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
 
         console.log('Word marked as learned for the user');
-      } else {
+      } else
+      {
         console.log('User not found');
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error updating user data:', error);
     }
   };
@@ -229,76 +213,114 @@ const LearnedPage = () => {
     console.log('Word removed from learned for the user');
   };
 
-  
-
-
-
-
-
   const favoriteButton = () => {
-    if (isFavorite) {
+    if (isFavorite)
+    {
       removeWordFromFavorites();
     }
-    else {
+    else
+    {
       addWordToFavorites();
     }
     setIsFavorite((prevIsFavorite) => !prevIsFavorite);
-};
+  };
 
-const addWordToFavorites = async () => {
-  try {
-    const firestore = getFirestore();
-    const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
-    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
-    const userSnapshot = await getDocs(userQuery);
+  const addWordToFavorites = async () => {
+    try
+    {
+      const firestore = getFirestore();
+      const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
+      const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+      const userSnapshot = await getDocs(userQuery);
 
-    if (!userSnapshot.empty) {
-      const userDoc = userSnapshot.docs[0];
-      const userId = userDoc.id;
+      if (!userSnapshot.empty)
+      {
+        const userDoc = userSnapshot.docs[0];
+        const userId = userDoc.id;
 
-      const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
+        const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
 
-      await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+        await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
 
-      console.log('Word marked as favorited for the user');
-    } else {
-      console.log('User not found');
+        console.log('Word marked as favorited for the user');
+      } else
+      {
+        console.log('User not found');
+      }
+    } catch (error)
+    {
+      console.error('Error updating user data:', error);
     }
-  } catch (error) {
-    console.error('Error updating user data:', error);
+  };
+
+  const removeWordFromFavorites = async () => {
+    const firestore = getFirestore();
+    const currentUserEmail = getUserEmail();
+    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+    const userQuerySnapshot = await getDocs(userQuery);
+    const userData = userQuerySnapshot.docs[0].data();
+    const favoritesWordsIds = userData.favoritesWords || [];
+    const currentWordId = words[currentIndex].id;
+    const newFavoritesWordsIds = favoritesWordsIds.filter((wordId) => wordId !== currentWordId);
+    const userId = userQuerySnapshot.docs[0].id;
+    const userDataUpdate = { favoritesWords: newFavoritesWordsIds };
+    await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+    console.log('Word removed from favorites for the user');
+  };
+
+  const getUserEmail = () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    const currentUserEmail = currentUser.email;
+    return currentUserEmail;
   }
-};
-
-const removeWordFromFavorites = async () => {
-  const firestore = getFirestore();
-  const currentUserEmail = getUserEmail();
-  const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
-  const userQuerySnapshot = await getDocs(userQuery);
-  const userData = userQuerySnapshot.docs[0].data();
-  const favoritesWordsIds = userData.favoritesWords || [];
-  const currentWordId = words[currentIndex].id;
-  const newFavoritesWordsIds = favoritesWordsIds.filter((wordId) => wordId !== currentWordId);
-  const userId = userQuerySnapshot.docs[0].id;
-  const userDataUpdate = { favoritesWords: newFavoritesWordsIds };
-  await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
-  console.log('Word removed from favorites for the user');
-};
-
-
-
-
-const getUserEmail = () => {
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
-  const currentUserEmail = currentUser.email;
-  return currentUserEmail;
-}
 
   const removeWord = () => {
     console.log('Kelime Çıkarıldı');
     setIsLearned((prevIsLearned) => !prevIsLearned);
   };
 
+  const fetchUserLearnedWords = async (email) => {
+    try
+    {
+      const firestore = getFirestore();
+      const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
+      const userQuerySnapshot = await getDocs(userQuery);
+      const userData = userQuerySnapshot.docs[0].data();
+      setUserData(userData);
+      const learnedWordsIds = userData.learnedWords || [];
+      const learnedWordsData = [];
+      for (let i = 0; i < learnedWordsIds.length; i++)
+      {
+        const wordId = learnedWordsIds[i];
+        const wordDoc = await getDoc(doc(firestore, 'Words', wordId));
+        const wordData = wordDoc.data();
+        learnedWordsData.push({ id: wordId, ...wordData });
+      }
+      setLearnedWordsData(learnedWordsData);
+      setWords(learnedWordsData);
+      setIsLoading(false);
+      const isLearned = await isWordInLearnedArray(learnedWordsIds[0]);
+      const isFavorite = await isWordInFavoritesArray(learnedWordsIds[0]);
+
+      setIsLearned(isLearned);
+      setIsFavorite(isFavorite);
+
+    } catch (error)
+    {
+      console.error('Error fetching user learned words:', error);
+    }
+  };
+
+  if (isLoading)
+  {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -308,7 +330,7 @@ const getUserEmail = () => {
             <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
           </TouchableOpacity>
           <TouchableOpacity onPress={addToLearned} style={styles.iconContainer}>
-            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'green'} />
+            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'black'} />
           </TouchableOpacity>
         </View>
       ) : (
@@ -350,7 +372,7 @@ const getUserEmail = () => {
 
       {learnedWordsData.length !== 0 ? (
         <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
+          <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
             <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>
 

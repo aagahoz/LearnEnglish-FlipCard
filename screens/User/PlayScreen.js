@@ -5,10 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { getFirestore, collection, getDocs, doc, updateDoc, arrayUnion, query, where } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-/*
-TODO Sayfa ilk açıldığında ilk kelimenin favorited-learned kontrolü eksik.
-TODO Sayfa ilk açıldığında back butonu kapatılmıyor.
-*/
 
 const PlayPage = () => {
   const [words, setWords] = useState([]);
@@ -23,32 +19,8 @@ const PlayPage = () => {
 
   useEffect(() => {
     fetchWords();
-    
   }, []);
-
-  const fetchWords = async () => {
-    try {
-      const firestore = getFirestore();
-      const wordsCollection = collection(firestore, 'Words');
-      const wordsSnapshot = await getDocs(wordsCollection);
-      const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
-
-      setWords(wordsData);
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error fetching words:', error);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3498db" />
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
+  
   const toggleDisplayLanguage = () => {
     setIsFlipped(true);
     setDisplayEnglish((prevDisplay) => !prevDisplay);
@@ -246,6 +218,38 @@ const PlayPage = () => {
     }
   }
 
+  const fetchWords = async () => {
+    try {
+      const firestore = getFirestore();
+      const wordsCollection = collection(firestore, 'Words');
+      const wordsSnapshot = await getDocs(wordsCollection);
+      const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
+  
+      setWords(wordsData);
+      setIsLoading(false);
+  
+      // Check if the first word is favorited or learned
+      const firstWordId = wordsData.length > 0 ? wordsData[0].id : null;
+      const isLearned = await isWordInLearnedArray(firstWordId);
+      const isFavorite = await isWordInFavoritesArray(firstWordId);
+      
+      setIsLearned(isLearned);
+      setIsFavorite(isFavorite);
+    } catch (error) {
+      console.error('Error fetching words:', error);
+    }
+  };
+  
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#3498db" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -365,3 +369,5 @@ const styles = StyleSheet.create({
 });
 
 export default PlayPage;
+
+
