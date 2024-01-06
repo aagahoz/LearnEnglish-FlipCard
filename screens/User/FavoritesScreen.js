@@ -8,8 +8,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 /*
 TODO Sayfa ilk açıldığında ilk kelimenin favorited-learned kontrolü eksik.
 TODO Sayfa ilk açıldığında back butonu kapatılmıyor.
-! next back çalışmıyor
-! Ekleme işlemleri çalışmıyor
 */
 
 const FavoritePage = () => {

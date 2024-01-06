@@ -350,11 +350,11 @@ const getUserEmail = () => {
 
       {learnedWordsData.length !== 0 ? (
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={goBack} style={styles.button}>
+        <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
             <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={goNext} style={styles.button}>
+          <TouchableOpacity onPress={goNext} style={styles.button} disabled={!isNextHave}>
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
