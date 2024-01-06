@@ -16,9 +16,8 @@ const LearnedPage = () => {
   const [isLearned, setIsLearned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState(null);
-  const [isBackHave, setIsBackHave] = useState(true);
+  const [isBackHave, setIsBackHave] = useState(false);
   const [isNextHave, setIsNextHave] = useState(true);
-
 
   useEffect(() => {
     const auth = getAuth();
@@ -41,9 +40,16 @@ const LearnedPage = () => {
   }, []);
 
   const toggleDisplayLanguage = () => {
-    setIsFlipped(true);
-    setDisplayEnglish((prevDisplay) => !prevDisplay);
-    console.log('toggleDisplayLanguage');
+    if (isFlipped)
+    {
+      setIsFlipped(false);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
+    }
+    if (!isFlipped)
+    {
+      setIsFlipped(true);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
+    }
   };
 
   const goNext = async () => {
@@ -146,17 +152,6 @@ const LearnedPage = () => {
     }
   }
 
-  const fetchUserFirstLearnedWord = () => {
-    const firestore = getFirestore();
-    const currentUserEmail = getUserEmail();
-    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
-    const userQuerySnapshot = getDocs(userQuery);
-    const userData = userQuerySnapshot.docs[0].data();
-    const learnedWordsIds = userData.learnedWords || [];
-    const firstWordId = learnedWordsIds[0];
-    return firstWordId;
-  };
-
   const addToLearned = () => {
     if (isLearned)
     {
@@ -232,16 +227,12 @@ const LearnedPage = () => {
       const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
-
       if (!userSnapshot.empty)
       {
         const userDoc = userSnapshot.docs[0];
         const userId = userDoc.id;
-
         const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
-
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
-
         console.log('Word marked as favorited for the user');
       } else
       {
@@ -275,11 +266,6 @@ const LearnedPage = () => {
     return currentUserEmail;
   }
 
-  const removeWord = () => {
-    console.log('Kelime Çıkarıldı');
-    setIsLearned((prevIsLearned) => !prevIsLearned);
-  };
-
   const fetchUserLearnedWords = async (email) => {
     try
     {
@@ -300,9 +286,20 @@ const LearnedPage = () => {
       setLearnedWordsData(learnedWordsData);
       setWords(learnedWordsData);
       setIsLoading(false);
+
+      if (learnedWordsData.length === 1 || learnedWordsData.length === 0)
+      {
+        setIsBackHave(false);
+        setIsNextHave(false);
+      }
+      else if (learnedWordsData.length > 1)
+      {
+        setIsBackHave(false);
+        setIsNextHave(true);
+      }
+
       const isLearned = await isWordInLearnedArray(learnedWordsIds[0]);
       const isFavorite = await isWordInFavoritesArray(learnedWordsIds[0]);
-
       setIsLearned(isLearned);
       setIsFavorite(isFavorite);
 
@@ -346,9 +343,6 @@ const LearnedPage = () => {
           flipVertical={false}
           flip={isFlipped}
           clickable={true}
-          onFlipEnd={(isFlipEnd) => {
-            console.log('isFlipEnd', isFlipEnd);
-          }}
         >
           {/* Front Side */}
           <View style={[styles.card, styles.cardFront]}>
@@ -372,11 +366,11 @@ const LearnedPage = () => {
 
       {learnedWordsData.length !== 0 ? (
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
+          <TouchableOpacity onPress={goBack} style={[styles.button, !isBackHave ? styles.disabledButton : null]} disabled={!isBackHave}>
             <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={goNext} style={styles.button} disabled={!isNextHave}>
+          <TouchableOpacity onPress={goNext} style={[styles.button, !isNextHave ? styles.disabledButton : null]} disabled={!isNextHave}>
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
@@ -430,6 +424,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#A0CD60',
     borderRadius: 8,
     width: '45%',
+  },
+  disabledButton: {
+    backgroundColor: '#BDC3C7',
   },
   cardContainer: {
     width: 300,

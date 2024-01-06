@@ -5,11 +5,6 @@ import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, arrayUnion, 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { MaterialIcons } from '@expo/vector-icons';
 
-/*
-TODO Sayfa ilk açıldığında ilk kelimenin favorited-learned kontrolü eksik.
-TODO Sayfa ilk açıldığında back butonu kapatılmıyor.
-*/
-
 const FavoritePage = () => {
   const [userEmail, setUserEmail] = useState(null);
   const [favoritesWordsData, setFavoritesWordsData] = useState([]);
@@ -20,7 +15,7 @@ const FavoritePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLearned, setIsLearned] = useState(false);
   const [words, setWords] = useState(null);
-  const [isBackHave, setIsBackHave] = useState(true);
+  const [isBackHave, setIsBackHave] = useState(false);
   const [isNextHave, setIsNextHave] = useState(true);
 
   useEffect(() => {
@@ -43,47 +38,17 @@ const FavoritePage = () => {
     return () => unsubscribe();
   }, []);
 
-  const fetchUserFavoriteWords = async (email) => {
-    try
-    {
-
-      const firestore = getFirestore();
-      const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
-      const userQuerySnapshot = await getDocs(userQuery);
-      const userData = userQuerySnapshot.docs[0].data();
-      const favoritesWordsIds = userData.favoritesWords || [];
-      const favoritesWordsData = [];
-
-      for (let i = 0; i < favoritesWordsIds.length; i++)
-      {
-        const wordId = favoritesWordsIds[i];
-        const wordDoc = await getDoc(doc(firestore, 'Words', wordId));
-        const wordData = wordDoc.data();
-        favoritesWordsData.push(wordData);
-      }
-
-      setWords(favoritesWordsData);
-      setFavoritesWordsData(favoritesWordsData);
-      setIsLoading(false);
-    } catch (error)
-    {
-      console.log(error);
-    }
-  };
-
-  if (isLoading)
-  {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="blue" />
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   const toggleDisplayLanguage = () => {
-    setIsFlipped(true);
-    setDisplayEnglish((prevDisplay) => !prevDisplay);
+    if (isFlipped)
+    {
+      setIsFlipped(false);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
+    }
+    if (!isFlipped)
+    {
+      setIsFlipped(true);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
+    }
   };
 
   const goNext = async () => {
@@ -92,36 +57,41 @@ const FavoritePage = () => {
     const isFavorite = await isWordInFavoritesArray(getNextWordID());
 
 
-    if (currentIndex < words.length - 1) {
+    if (currentIndex < words.length - 1)
+    {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false);
     }
 
-    if (currentIndex === words.length - 2) {
+    if (currentIndex === words.length - 2)
+    {
       setIsNextHave(false);
     }
-    if (currentIndex === 0) {
+    if (currentIndex === 0)
+    {
       setIsBackHave(true);
     }
 
     setIsLearned(isLearned);
     setIsFavorite(isFavorite);
   };
-  
 
   const goBack = async () => {
     const isLearned = await isWordInLearnedArray(getPrevWordID());
     const isFavorite = await isWordInFavoritesArray(getPrevWordID());
 
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false);
     }
-    
-    if (currentIndex === 1) {
+
+    if (currentIndex === 1)
+    {
       setIsBackHave(false);
     }
-    if (currentIndex === words.length - 1) {
+    if (currentIndex === words.length - 1)
+    {
       setIsNextHave(true);
     }
 
@@ -153,53 +123,55 @@ const FavoritePage = () => {
     const favoritesWordsIds = userData.favoritesWords || [];
     const currentWordId = WordID;
     const isWordinFavoritesArray = favoritesWordsIds.includes(currentWordId);
-    
+
     return isWordinFavoritesArray;
   }
 
   const getNextWordID = () => {
     const maxIndex = words.length - 1;
-    console.log("max index : ", maxIndex);
-    console.log("current index : ", currentIndex);
-    console.log("word length : ", words.length)
-
-
-    if (currentIndex < maxIndex) {
+    if (currentIndex < maxIndex)
+    {
       const nextWordId = words[currentIndex + 1].id;
       return nextWordId;
-    } else {
+    } else
+    {
       return null;
     }
   }
 
   const getPrevWordID = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       const prevWordId = words[currentIndex - 1].id;
       return prevWordId;
-    } else {
+    } else
+    {
       return null;
     }
   }
 
   const addToLearned = () => {
-    if (isLearned) {
+    if (isLearned)
+    {
       removeWordFromLearned();
     }
-    else {
+    else
+    {
       addWordToLearned();
     }
     setIsLearned((prevIsLearned) => !prevIsLearned);
   };
 
-
   const addWordToLearned = async () => {
-    try {
+    try
+    {
       const firestore = getFirestore();
       const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
 
-      if (!userSnapshot.empty) {
+      if (!userSnapshot.empty)
+      {
         const userDoc = userSnapshot.docs[0];
         console.log('userDoc', userDoc);
         const userId = userDoc.id;
@@ -209,10 +181,12 @@ const FavoritePage = () => {
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
 
         console.log('Word marked as learned for the user');
-      } else {
+      } else
+      {
         console.log('User not found');
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error updating user data:', error);
     }
   };
@@ -232,133 +206,182 @@ const FavoritePage = () => {
     console.log('Word removed from learned for the user');
   };
 
-  
-
-
-
-
-
   const favoriteButton = () => {
-    if (isFavorite) {
+    if (isFavorite)
+    {
       removeWordFromFavorites();
     }
-    else {
+    else
+    {
       addWordToFavorites();
     }
     setIsFavorite((prevIsFavorite) => !prevIsFavorite);
-};
-
-const addWordToFavorites = async () => {
-  try {
-    const firestore = getFirestore();
-    const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
-    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
-    const userSnapshot = await getDocs(userQuery);
-
-    if (!userSnapshot.empty) {
-      const userDoc = userSnapshot.docs[0];
-      const userId = userDoc.id;
-
-      const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
-
-      await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
-
-      console.log('Word marked as favorited for the user');
-    } else {
-      console.log('User not found');
-    }
-  } catch (error) {
-    console.error('Error updating user data:', error);
-  }
-};
-
-const removeWordFromFavorites = async () => {
-  const firestore = getFirestore();
-  const currentUserEmail = getUserEmail();
-  const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
-  const userQuerySnapshot = await getDocs(userQuery);
-  const userData = userQuerySnapshot.docs[0].data();
-  const favoritesWordsIds = userData.favoritesWords || [];
-  const currentWordId = words[currentIndex].id;
-  const newFavoritesWordsIds = favoritesWordsIds.filter((wordId) => wordId !== currentWordId);
-  const userId = userQuerySnapshot.docs[0].id;
-  const userDataUpdate = { favoritesWords: newFavoritesWordsIds };
-  await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
-  console.log('Word removed from favorites for the user');
-};
-
-
-
-
-const getUserEmail = () => {
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
-  const currentUserEmail = currentUser.email;
-  return currentUserEmail;
-}
-
-  const removeWord = () => {
-    console.log('Kelime Çıkarıldı');
-    setIsLearned((prevIsLearned) => !prevIsLearned);
   };
 
+  const addWordToFavorites = async () => {
+    try
+    {
+      const firestore = getFirestore();
+      const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
+      const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+      const userSnapshot = await getDocs(userQuery);
 
+      if (!userSnapshot.empty)
+      {
+        const userDoc = userSnapshot.docs[0];
+        const userId = userDoc.id;
 
+        const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
+
+        await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+
+        console.log('Word marked as favorited for the user');
+      } else
+      {
+        console.log('User not found');
+      }
+    } catch (error)
+    {
+      console.error('Error updating user data:', error);
+    }
+  };
+
+  const removeWordFromFavorites = async () => {
+    const firestore = getFirestore();
+    const currentUserEmail = getUserEmail();
+    const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
+    const userQuerySnapshot = await getDocs(userQuery);
+    const userData = userQuerySnapshot.docs[0].data();
+    const favoritesWordsIds = userData.favoritesWords || [];
+    const currentWordId = words[currentIndex].id;
+    const newFavoritesWordsIds = favoritesWordsIds.filter((wordId) => wordId !== currentWordId);
+    const userId = userQuerySnapshot.docs[0].id;
+    const userDataUpdate = { favoritesWords: newFavoritesWordsIds };
+    await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
+    console.log('Word removed from favorites for the user');
+  };
+
+  const getUserEmail = () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    const currentUserEmail = currentUser.email;
+    return currentUserEmail;
+  }
+
+  const fetchUserFavoriteWords = async (email) => {
+    try
+    {
+      const firestore = getFirestore();
+      const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
+      const userQuerySnapshot = await getDocs(userQuery);
+      const userData = userQuerySnapshot.docs[0].data();
+      const favoritesWordsIds = userData.favoritesWords || [];
+      const favoritesWordsData = [];
+
+      for (let i = 0; i < favoritesWordsIds.length; i++)
+      {
+        const wordId = favoritesWordsIds[i];
+        const wordDoc = await getDoc(doc(firestore, 'Words', wordId));
+        const wordData = wordDoc.data();
+        favoritesWordsData.push(wordData);
+      }
+      setWords(favoritesWordsData);
+      setFavoritesWordsData(favoritesWordsData);
+      setIsLoading(false);
+
+      if (favoritesWordsData.length === 0)
+      {
+        return;
+      }
+      else if (favoritesWordsData.length === 1)
+      {
+        setIsBackHave(false);
+        setIsNextHave(false);
+      }
+
+      if (favoritesWordsIds.length === 1 || favoritesWordsIds.length === 0)
+      {
+        setIsBackHave(false);
+        setIsNextHave(false);
+      }
+      else if (favoritesWordsIds.length > 1)
+      {
+        setIsBackHave(false);
+        setIsNextHave(true);
+      }
+
+      const isLearned = await isWordInLearnedArray(favoritesWordsData[0].id);
+      const isFavorite = await isWordInFavoritesArray(favoritesWordsData[0].id);
+
+      setIsLearned(isLearned);
+      setIsFavorite(isFavorite);
+    } catch (error)
+    {
+      console.log(error);
+    }
+  };
+
+  if (isLoading)
+  {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       {words.length !== 0 ? (
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={favoriteButton} style={styles.iconContainer}>
-          <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="#e74c3c" />
-        </TouchableOpacity>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={favoriteButton} style={styles.iconContainer}>
+            <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="#e74c3c" />
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={addToLearned} style={styles.iconContainer}>
-          <MaterialIcons name="add-task" size={34} color={isLearned ? '#2ecc71' : '#34495e'} />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={addToLearned} style={styles.iconContainer}>
+            <MaterialIcons name="add-task" size={34} color={isLearned ? '#2ecc71' : '#34495e'} />
+          </TouchableOpacity>
+        </View>
       ) : (
         <Text style={styles.noWordsText}>You have no words in your favorites yet.</Text>
       )}
 
-      { words.length !== 0 ? (
-      <FlipCard
-        style={styles.cardContainer}
-        friction={2.4}
-        perspective={1000}
-        flipHorizontal={true}
-        flipVertical={false}
-        flip={isFlipped}
-        clickable={true}
-        onFlipEnd={(isFlipEnd) => {
-          console.log('isFlipEnd', isFlipEnd);
-        }}
-      >
-        <View style={[styles.card, styles.cardFront]}>
-          <TouchableOpacity onPress={toggleDisplayLanguage}>
-            <Text style={styles.cardText}>{displayEnglish ? favoritesWordsData[currentIndex]?.eng : favoritesWordsData[currentIndex]?.tr}</Text>
+      {words.length !== 0 ? (
+        <FlipCard
+          style={styles.cardContainer}
+          friction={2.4}
+          perspective={1000}
+          flipHorizontal={true}
+          flipVertical={false}
+          flip={isFlipped}
+          clickable={true}
+        >
+          <View style={[styles.card, styles.cardFront]}>
+            <TouchableOpacity onPress={toggleDisplayLanguage}>
+              <Text style={styles.cardText}>{displayEnglish ? favoritesWordsData[currentIndex]?.eng : favoritesWordsData[currentIndex]?.tr}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.card, styles.cardBack]}>
+            <TouchableOpacity onPress={toggleDisplayLanguage}>
+              <Text style={styles.cardText}>{displayEnglish ? favoritesWordsData[currentIndex]?.tr : favoritesWordsData[currentIndex]?.eng}</Text>
+            </TouchableOpacity>
+          </View>
+        </FlipCard>
+      ) : null}
+
+      {words.length !== 0 ? (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={goBack} style={[styles.button, !isBackHave ? styles.disabledButton : null]} disabled={!isBackHave}>
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={goNext} style={[styles.button, !isNextHave ? styles.disabledButton : null]} disabled={!isNextHave}>
+            <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={[styles.card, styles.cardBack]}>
-          <TouchableOpacity onPress={toggleDisplayLanguage}>
-            <Text style={styles.cardText}>{displayEnglish ? favoritesWordsData[currentIndex]?.tr : favoritesWordsData[currentIndex]?.eng}</Text>
-          </TouchableOpacity>
-        </View>
-      </FlipCard>
-      ) : null }
-
-      { words.length !== 0 ? (
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
-          <Text style={styles.buttonText}>Back</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={goNext} style={styles.button} disabled={!isNextHave}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-      ) : null }
+      ) : null}
     </View>
   );
 };
@@ -409,6 +432,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '45%',
   },
+  disabledButton: {
+    backgroundColor: '#BDC3C7',
+  },
   cardContainer: {
     width: 300,
     height: 400,
@@ -436,9 +462,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
 export default FavoritePage;
-
-
-// setWords(userData);
-//         console.log('userData', userData);

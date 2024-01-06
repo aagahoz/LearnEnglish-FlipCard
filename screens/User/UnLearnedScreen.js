@@ -16,7 +16,7 @@ const UnLearnedPage = () => {
   const [isLearned, setIsLearned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState(null);
-  const [isBackHave, setIsBackHave] = useState(true);
+  const [isBackHave, setIsBackHave] = useState(false);
   const [isNextHave, setIsNextHave] = useState(true);
 
   useEffect(() => {
@@ -39,47 +39,22 @@ const UnLearnedPage = () => {
     return () => unsubscribe();
   }, []);
 
-  const fetchUserUnLearnedWords = async (email) => {
-    try
+  const toggleDisplayLanguage = () => {
+    if (isFlipped)
     {
-      const firestore = getFirestore();
-      const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
-      const userQuerySnapshot = await getDocs(userQuery);
-      const userData = userQuerySnapshot.docs[0].data();
-      const learnedWordsIds = userData.learnedWords || [];
-      const wordsQuery = query(collection(firestore, 'Words'), where('id', 'not-in', learnedWordsIds));
-      const wordsQuerySnapshot = await getDocs(wordsQuery);
-      const wordsData = wordsQuerySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setWords(wordsData);
-      setLearnedWordsData(wordsData);
-      setIsLoading(false);
-    } catch (error)
+      setIsFlipped(false);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
+    }
+    if (!isFlipped)
     {
-      console.error('Error fetching user learned words:', error);
+      setIsFlipped(true);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
     }
   };
 
-  if (isLoading)
-  {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="blue" />
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-  const toggleDisplayLanguage = () => {
-    setIsFlipped(true);
-    setDisplayEnglish((prevDisplay) => !prevDisplay);
-    console.log('toggleDisplayLanguage');
-  };
-
   const goNext = async () => {
-
     const isLearned = await isWordInLearnedArray(getNextWordID());
     const isFavorite = await isWordInFavoritesArray(getNextWordID());
-
 
     if (currentIndex < words.length - 1)
     {
@@ -102,7 +77,6 @@ const UnLearnedPage = () => {
   };
 
   const goBack = async () => {
-
     const isLearned = await isWordInLearnedArray(getPrevWordID());
     const isFavorite = await isWordInFavoritesArray(getPrevWordID());
 
@@ -141,7 +115,6 @@ const UnLearnedPage = () => {
   };
 
   const isWordInFavoritesArray = async (WordID) => {
-    // get user learnedWords array
     const firestore = getFirestore();
     const currentUserEmail = getUserEmail();
     const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
@@ -156,11 +129,6 @@ const UnLearnedPage = () => {
 
   const getNextWordID = () => {
     const maxIndex = words.length - 1;
-    console.log("max index : ", maxIndex);
-    console.log("current index : ", currentIndex);
-    console.log("word length : ", words.length)
-
-
     if (currentIndex < maxIndex)
     {
       const nextWordId = words[currentIndex + 1].id;
@@ -205,13 +173,9 @@ const UnLearnedPage = () => {
       if (!userSnapshot.empty)
       {
         const userDoc = userSnapshot.docs[0];
-        console.log('userDoc', userDoc);
         const userId = userDoc.id;
-
         const userDataUpdate = { learnedWords: arrayUnion(words[currentIndex].id) };
-
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
-
         console.log('Word marked as learned for the user');
       } else
       {
@@ -235,7 +199,6 @@ const UnLearnedPage = () => {
     const userId = userQuerySnapshot.docs[0].id;
     const userDataUpdate = { learnedWords: newLearnedWordsIds };
     await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
-    console.log('Word removed from learned for the user');
   };
 
   const favoriteButton = () => {
@@ -254,7 +217,7 @@ const UnLearnedPage = () => {
     try
     {
       const firestore = getFirestore();
-      const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
+      const currentUserEmail = getUserEmail();
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
 
@@ -298,12 +261,55 @@ const UnLearnedPage = () => {
     const currentUser = auth.currentUser;
     const currentUserEmail = currentUser.email;
     return currentUserEmail;
-  }
-
-  const removeWord = () => {
-    console.log('Kelime Çıkarıldı');
-    setIsLearned((prevIsLearned) => !prevIsLearned);
   };
+
+  const fetchUserUnLearnedWords = async (email) => {
+    try
+    {
+      const firestore = getFirestore();
+      const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
+      const userQuerySnapshot = await getDocs(userQuery);
+      const userData = userQuerySnapshot.docs[0].data();
+      const learnedWordsIds = userData.learnedWords || [];
+      if (learnedWordsIds.length === 0)
+      {
+        const wordsQuery = query(collection(firestore, 'Words'));
+        const wordsQuerySnapshot = await getDocs(wordsQuery);
+        const wordsData = wordsQuerySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        setWords(wordsData);
+        setLearnedWordsData(wordsData);
+        setIsLoading(false);
+      }
+      else
+      {
+        const wordsQuery = query(collection(firestore, 'Words'));
+        const wordsQuerySnapshot = await getDocs(wordsQuery);
+        const wordsData = wordsQuerySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        const unLearnedWordsData = wordsData.filter((word) => !learnedWordsIds.includes(word.id));
+        setWords(unLearnedWordsData);
+        setLearnedWordsData(unLearnedWordsData);
+        setIsLoading(false);
+
+        const isLearned = await isWordInLearnedArray(wordsData[currentIndex].id);
+        const isFavorite = await isWordInFavoritesArray(wordsData[currentIndex].id);
+        setIsLearned(isLearned);
+        setIsFavorite(isFavorite);
+      }
+    } catch (error)
+    {
+      console.error('Error fetching user learned words:', error);
+    }
+  };
+
+  if (isLoading)
+  {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="blue" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -313,7 +319,7 @@ const UnLearnedPage = () => {
             <MaterialIcons name={isFavorite ? 'favorite' : 'favorite-border'} size={34} color="red" />
           </TouchableOpacity>
           <TouchableOpacity onPress={addToLearned} style={styles.iconContainer}>
-            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'green'} />
+            <MaterialIcons name="add-task" size={34} color={isLearned ? 'green' : 'black'} />
           </TouchableOpacity>
         </View>
       ) : (
@@ -329,9 +335,6 @@ const UnLearnedPage = () => {
           flipVertical={false}
           flip={isFlipped}
           clickable={true}
-          onFlipEnd={(isFlipEnd) => {
-            console.log('isFlipEnd', isFlipEnd);
-          }}
         >
           {/* Front Side */}
           <View style={[styles.card, styles.cardFront]}>
@@ -355,11 +358,11 @@ const UnLearnedPage = () => {
 
       {learnedWordsData.length !== 0 ? (
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
+          <TouchableOpacity onPress={goBack} style={[styles.button, !isBackHave ? styles.disabledButton : null]} disabled={!isBackHave}>
             <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={goNext} style={styles.button} disabled={!isNextHave}>
+          <TouchableOpacity onPress={goNext} style={[styles.button, !isNextHave ? styles.disabledButton : null]} disabled={!isNextHave}>
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
@@ -413,6 +416,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#A0CD60',
     borderRadius: 8,
     width: '45%',
+  },
+  disabledButton: {
+    backgroundColor: '#BDC3C7',
   },
   cardContainer: {
     width: 300,

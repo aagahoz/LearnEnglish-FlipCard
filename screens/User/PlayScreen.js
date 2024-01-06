@@ -5,7 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { getFirestore, collection, getDocs, doc, updateDoc, arrayUnion, query, where } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-
 const PlayPage = () => {
   const [words, setWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -14,31 +13,42 @@ const PlayPage = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLearned, setIsLearned] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isBackHave, setIsBackHave] = useState(true);
+  const [isBackHave, setIsBackHave] = useState(false);
   const [isNextHave, setIsNextHave] = useState(true);
 
   useEffect(() => {
     fetchWords();
   }, []);
-  
+
   const toggleDisplayLanguage = () => {
-    setIsFlipped(true);
-    setDisplayEnglish((prevDisplay) => !prevDisplay);
+    if (isFlipped)
+    {
+      setIsFlipped(false);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
+    }
+    if (!isFlipped)
+    {
+      setIsFlipped(true);
+      setDisplayEnglish((prevDisplay) => !prevDisplay);
+    }
   };
 
   const goNext = async () => {
     const isLearned = await isWordInLearnedArray(getNextWordID());
     const isFavorite = await isWordInFavoritesArray(getNextWordID());
 
-    if (currentIndex < words.length - 1) {
+    if (currentIndex < words.length - 1)
+    {
       setCurrentIndex((prevIndex) => prevIndex + 1);
       setIsFlipped(false);
     }
 
-    if (currentIndex === words.length - 2) {
+    if (currentIndex === words.length - 2)
+    {
       setIsNextHave(false);
     }
-    if (currentIndex === 0) {
+    if (currentIndex === 0)
+    {
       setIsBackHave(true);
     }
 
@@ -50,15 +60,18 @@ const PlayPage = () => {
     const isLearned = await isWordInLearnedArray(getPrevWordID());
     const isFavorite = await isWordInFavoritesArray(getPrevWordID());
 
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       setCurrentIndex((prevIndex) => prevIndex - 1);
       setIsFlipped(false);
     }
-    
-    if (currentIndex === 1) {
+
+    if (currentIndex === 1)
+    {
       setIsBackHave(false);
     }
-    if (currentIndex === words.length - 1) {
+    if (currentIndex === words.length - 1)
+    {
       setIsNextHave(true);
     }
 
@@ -67,33 +80,39 @@ const PlayPage = () => {
   };
 
   const addToLearned = () => {
-    if (isLearned) {
+    if (isLearned)
+    {
       removeWordFromLearned();
     }
-    else {
+    else
+    {
       addWordToLearned();
     }
     setIsLearned((prevIsLearned) => !prevIsLearned);
   };
 
   const favoriteButton = () => {
-      if (isFavorite) {
-        removeWordFromFavorites();
-      }
-      else {
-        addWordToFavorites();
-      }
-      setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+    if (isFavorite)
+    {
+      removeWordFromFavorites();
+    }
+    else
+    {
+      addWordToFavorites();
+    }
+    setIsFavorite((prevIsFavorite) => !prevIsFavorite);
   };
 
   const addWordToLearned = async () => {
-    try {
+    try
+    {
       const firestore = getFirestore();
       const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
 
-      if (!userSnapshot.empty) {
+      if (!userSnapshot.empty)
+      {
         const userDoc = userSnapshot.docs[0];
         const userId = userDoc.id;
 
@@ -102,34 +121,37 @@ const PlayPage = () => {
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
 
         console.log('Word marked as learned for the user');
-      } else {
+      } else
+      {
         console.log('User not found');
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error updating user data:', error);
     }
   };
 
   const addWordToFavorites = async () => {
-    try {
+    try
+    {
       const firestore = getFirestore();
       const currentUserEmail = getUserEmail(); // Oturum açan kullanıcının email bilgisini buraya ekleyin
       const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
       const userSnapshot = await getDocs(userQuery);
 
-      if (!userSnapshot.empty) {
+      if (!userSnapshot.empty)
+      {
         const userDoc = userSnapshot.docs[0];
         const userId = userDoc.id;
-
         const userDataUpdate = { favoritesWords: arrayUnion(words[currentIndex].id) };
-
         await updateDoc(doc(firestore, 'Users', userId), userDataUpdate);
-
         console.log('Word marked as favorited for the user');
-      } else {
+      } else
+      {
         console.log('User not found');
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error updating user data:', error);
     }
   };
@@ -165,7 +187,6 @@ const PlayPage = () => {
   };
 
   const isWordInLearnedArray = async (WordID) => {
-    // get user learnedWords array
     const firestore = getFirestore();
     const currentUserEmail = getUserEmail();
     const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
@@ -179,7 +200,6 @@ const PlayPage = () => {
   };
 
   const isWordInFavoritesArray = async (WordID) => {
-    // get user learnedWords array
     const firestore = getFirestore();
     const currentUserEmail = getUserEmail();
     const userQuery = query(collection(firestore, 'Users'), where('email', '==', currentUserEmail));
@@ -188,7 +208,7 @@ const PlayPage = () => {
     const favoritesWordsIds = userData.favoritesWords || [];
     const currentWordId = WordID;
     const isWordinFavoritesArray = favoritesWordsIds.includes(currentWordId);
-    
+
     return isWordinFavoritesArray;
   }
 
@@ -201,47 +221,50 @@ const PlayPage = () => {
 
   const getNextWordID = () => {
     const maxIndex = words.length - 1;
-    if (currentIndex < maxIndex) {
+    if (currentIndex < maxIndex)
+    {
       const nextWordId = words[currentIndex + 1].id;
       return nextWordId;
-    } else {
+    } else
+    {
       return null;
     }
   }
 
   const getPrevWordID = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0)
+    {
       const prevWordId = words[currentIndex - 1].id;
       return prevWordId;
-    } else {
+    } else
+    {
       return null;
     }
   }
 
   const fetchWords = async () => {
-    try {
+    try
+    {
       const firestore = getFirestore();
       const wordsCollection = collection(firestore, 'Words');
       const wordsSnapshot = await getDocs(wordsCollection);
       const wordsData = wordsSnapshot.docs.map((doc) => doc.data());
-  
       setWords(wordsData);
       setIsLoading(false);
-  
-      // Check if the first word is favorited or learned
+
       const firstWordId = wordsData.length > 0 ? wordsData[0].id : null;
       const isLearned = await isWordInLearnedArray(firstWordId);
       const isFavorite = await isWordInFavoritesArray(firstWordId);
-      
       setIsLearned(isLearned);
       setIsFavorite(isFavorite);
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error fetching words:', error);
     }
   };
-  
 
-  if (isLoading) {
+  if (isLoading)
+  {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#3498db" />
@@ -270,9 +293,6 @@ const PlayPage = () => {
         flipVertical={false}
         flip={isFlipped}
         clickable={true}
-        onFlipEnd={(isFlipEnd) => {
-          console.log('isFlipEnd', isFlipEnd);
-        }}
       >
         <View style={[styles.card, styles.cardFront]}>
           <TouchableOpacity onPress={toggleDisplayLanguage}>
@@ -288,11 +308,11 @@ const PlayPage = () => {
       </FlipCard>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={goBack} style={styles.button} disabled={!isBackHave}>
+        <TouchableOpacity onPress={goBack} style={[styles.button, !isBackHave ? styles.disabledButton: null]} disabled={!isBackHave}>
           <Text style={styles.buttonText}>Back</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={goNext} style={styles.button} disabled={!isNextHave}>
+        <TouchableOpacity onPress={goNext} style={[styles.button, !isNextHave ? styles.disabledButton: null]} disabled={!isNextHave}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>
@@ -341,6 +361,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '45%',
   },
+  disabledButton: {
+    backgroundColor: '#BDC3C7',
+  },
   cardContainer: {
     width: 300,
     height: 400,
@@ -369,5 +392,3 @@ const styles = StyleSheet.create({
 });
 
 export default PlayPage;
-
-
