@@ -30,8 +30,6 @@
 #### Settings Screen
 <img width="501" alt="Screenshot 2023-12-28 at 10 37 28" src="https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/09ac0251-ca80-4873-9189-bb855993e275">
 
-#### Learn Screen ( User )
-![Screenshot 2023-12-28 at 10 37 04](https://github.com/aagahoz/LearnEnglish-FlipCard/assets/72024578/d6a54f79-7072-407b-ae6d-4b0ad2231bf9)
 
 #### Favorites Screen ( User )
 
